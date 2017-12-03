@@ -2,6 +2,6 @@ VERSION:3 SOURCE_TIMESTAMP:4B831307
 NODE:I LEVEL:0 LINE:24 "G:\Programme\cvavr\inc\mega128.h"
 NODE:I LEVEL:0 LINE:25 "G:\Programme\cvavr\inc\delay.h"
 NODE:I LEVEL:0 LINE:26 "G:\Programme\cvavr\inc\stdlib.h"
-NODE:I LEVEL:0 LINE:27 "F:\Roboterprojekt\Programmierung\First Projekt\modules\init\init.h"
-NODE:I LEVEL:0 LINE:28 "F:\Roboterprojekt\Programmierung\First Projekt\modules\demo.h"
+NODE:I LEVEL:0 LINE:27 "G:\Projects\iRobot\MEGA128\modules\init\init.h"
+NODE:I LEVEL:0 LINE:28 "G:\Projects\iRobot\MEGA128\modules\demo.h"
 NODE:F LEVEL:0 LINE:30 "main(void)"

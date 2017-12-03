@@ -59,7 +59,7 @@ int rc5_receive()
     rc5_ucToggle = i >> 11 & 1;
     rc5_ucAdress = i >> 6 & 0x1F;
     rc5_ucData = (i & 0x3F) | (~i >> 7 & 0x40);
-    return rc5_ucData;
+    return ucData;
   }
   else
     return -1;

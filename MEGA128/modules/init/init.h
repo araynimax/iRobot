@@ -6,6 +6,7 @@
 #include "wii_cam_init.h"
 #include "wheelencoder_init.h"
 #include "ultrasonic_init.h"
+#include "rc5_init.h";
 
 void initialize(){
    i2c_init();

@@ -8,7 +8,8 @@
 #define demostate_linedetector  3
 #define demostate_wiicam  4
 #define demostate_ultrasonic  5
-#define demostate_stop 6
+#define demostate_rc5  6
+#define demostate_stop 7
 
 int state = demostate_stop;
 int state_info = 0;
@@ -40,6 +41,22 @@ lcd_clear();
          state_info = 0;
         }
   }
+}
+
+void DEMOSTATE_RC5(){
+  int rc5 = rc5_receive();
+  char str[16];
+   lcd_clear();
+   if(rc5 != -1){
+     itoa(rc5,str);
+     lcd_puts(str);
+     delay_ms(100);
+ }
+ else
+ {
+   lcd_puts("NO SIGNAL");
+ }
+   delay_ms(50);
 }
 
 void DEMOSTATE_ULTRASONIC(){
@@ -232,6 +249,15 @@ void DEMOSTATE_MACHINE(){
             state_info = 1;
             }
             DEMOSTATE_ULTRASONIC();
+      break;
+      case demostate_rc5:
+            if(state_info == 0){
+            lcd_puts("RC5");
+            delay_ms(1000);
+            lcd_clear();
+            state_info = 1;
+            }
+            DEMOSTATE_RC5();
       break;
       default:
          lcd_clear();

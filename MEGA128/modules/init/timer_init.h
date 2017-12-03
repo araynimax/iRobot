@@ -2,6 +2,7 @@ void timer_init()
 {
     /**
      *  >>>>>>>>>> Timer/Counter 0 initialization <<<<<<<<<<<<
+     *  @INFO USED BY RC5-RECEIVER!!!
      */
     /**
      *
@@ -31,17 +32,17 @@ void timer_init()
      * BIT 1: WGM00
      * BIT 0: FOC0
      */
-    TCCR0 = 0b00000000;
+    TCCR0 = 0b00000110;
 
     /**
    * >>> Counter Register <<<
    */
-    TCNT0 = 0x64;
+    TCNT0 = 0x00;
 
     /**
    * >>> Output Compare Register <<<
    */
-    OCR0 = 0x10;
+    OCR0 = 0x00;
 
     /**
      * >>>>>>>>>> Timer/Counter 1 initialization <<<<<<<<<<<<
@@ -133,6 +134,7 @@ void timer_init()
 
     /**
      * >>>>>>>>>> Timer/Counter 3 initialization <<<<<<<<<<<<
+     * @INFO USED BY ULTRASONIC_SENSOR!!!
      */
 
     /**
@@ -207,7 +209,7 @@ void timer_init()
      * BIT 1: OCIE0
      * BIT 0: TOIE0
      */
-    TIMSK = 0b00000000;
+    TIMSK = 0b00000001;
 
     /**
      *
