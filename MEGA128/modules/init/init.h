@@ -8,6 +8,7 @@
 #include "ultrasonic_init.h"
 #include "rc5_init.h";
 #include "wheels_init.h"
+#include "esp_datatransfer_init.h"
 
 void initialize(){
    i2c_init();
@@ -18,4 +19,5 @@ void initialize(){
    adc_init();
    wheelencoder_init();
    ultrasonic_init();
+   esp_datatransfer_init();
 }

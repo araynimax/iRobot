@@ -1,6 +1,6 @@
 #include <twi.h>
+
 #define TWI_BUFFER_SIZE 32
-int esp_datatransfer_enabled=0;
 
 // 7bit slave I2C address
 #define TWI_SLAVE_ADDR 0x50
@@ -9,7 +9,7 @@ int esp_datatransfer_enabled=0;
 bit esp_datatransfer_received_ok=false;
 
 struct TSensor{
-
+   int test;
 };
 
 struct TData{
@@ -40,14 +40,14 @@ flash char * flash status_msg[8]=
 bool slave_rx_handler(bool rx_complete)
 {
   if (twi_result==TWI_RES_OK)
-    received_ok=true; // signal that data was received without errors
+    esp_datatransfer_received_ok=true; // signal that data was received without errors
   else
   {
     // TWI receive error, display the twi_result value
     lcd_clear();
     lcd_putsf("Receive error:\n");
     lcd_putsf(status_msg[twi_result]);
-    received_ok=false; // signal that data was received with errors
+    esp_datatransfer_received_ok=false; // signal that data was received with errors
     return false; // stop reception
   }
 
@@ -72,7 +72,7 @@ unsigned char slave_tx_handler(bool tx_complete)
 
   // transmission from slave to master has already started,
   // no more bytes to send in this transaction
-  if (received_ok)
+  if (esp_datatransfer_received_ok)
   {
     lcd_clear();
   }
