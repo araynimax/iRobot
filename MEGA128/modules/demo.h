@@ -50,7 +50,7 @@ void DEMOSTATE_RC5(){
    if(rc5 != -1){
      itoa(rc5,str);
      lcd_puts(str);
-     delay_ms(100);
+     delay_ms(1000);
  }
  else
  {
@@ -261,7 +261,7 @@ void DEMOSTATE_MACHINE(){
       break;
       default:
          lcd_clear();
-          lcd_puts("TEST - PROGRAMM");
+          lcd_puts("STOP");
      }
       delay_ms(50);
 }
