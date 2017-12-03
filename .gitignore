@@ -1,4 +1,6 @@
-
 MEGA128/Debug/
-
 MEGA128/Release/
+*.cci
+*.c~
+*.hci
+*.h~
