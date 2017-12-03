@@ -7,6 +7,7 @@
 #include "wheelencoder_init.h"
 #include "ultrasonic_init.h"
 #include "rc5_init.h";
+#include "wheels_init.h"
 
 void initialize(){
    i2c_init();
