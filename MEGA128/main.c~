@@ -1,0 +1,261 @@
+/*******************************************************
+This program was created by the
+CodeWizardAVR V3.17 UL Advanced
+Automatic Program Generator
+© Copyright 1998-2014 Pavel Haiduc, HP InfoTech s.r.l.
+http://www.hpinfotech.com
+
+Project : Mobile Robotik
+Version : 0.0.1
+Date    : 16.11.2017
+Author  : ArayniMax
+Company : 
+Comments: 
+
+
+Chip type               : ATmega128
+Program type            : Application
+AVR Core Clock frequency: 16,000000 MHz
+Memory model            : Small
+External RAM size       : 0
+Data Stack size         : 1024
+*******************************************************/
+
+#include <mega128.h>
+#include <delay.h>
+#include <stdlib.h>
+#include "modules/init/init.h"
+
+#define puts lcd_puts
+
+/**
+ *  States
+ */       
+
+#define state_distance_sensor  0
+#define state_engine  1
+#define state_lightsensor  2
+#define state_linedetector  3
+#define state_wiicam  4
+#define state_stop 5
+
+
+int state = state_stop; 
+int state_info = 0;
+
+int engine_dir = 0;
+
+int wiicamstate = 0;
+
+
+  int leftCounter = 0;
+  int rightCounter = 0;     
+  int leftEnc = 0;
+  int rightEnc = 0;
+
+ void STATE_DISTANCE_SENSOR(){   
+   lcd_clear();
+   
+   if(!DISTANCE_SENSOR_LEFT)
+     lcd_puts("LEFT: 1");
+   else  
+     lcd_puts("LEFT: 0");
+   if(!DISTANCE_SENSOR_RIGHT)
+     lcd_puts(" RIGHT: 1");
+   else  
+     lcd_puts(" RIGHT: 0");
+      
+   lcd_gotoxy(0,1);
+   
+   if(!DISTANCE_SENSOR_FRONT_LEFT)
+     lcd_puts("FLEFT: 1");
+   else  
+     lcd_puts("FLEFT: 0");
+   if(!DISTANCE_SENSOR_FRONT_RIGHT)
+     lcd_puts("FRIGHT:1");
+   else  
+     lcd_puts("FRIGHT:0");       
+ }
+ 
+ void STATE_ENGINE(){
+ char str[10];
+      ENGINE_ENABLE_RIGHT = 1;
+      ENGINE_ENABLE_LEFT = 1;
+             lcd_clear();                      
+      if(engine_dir == 0){
+        lcd_puts("     ENCODER  >>");
+        ENGINE_DIRECTION_LEFT = 0;  
+        ENGINE_DIRECTION_RIGHT = 0;
+        }
+      else{                           
+        lcd_puts("<<   ENCODER    ");     
+        ENGINE_DIRECTION_LEFT = 1;  
+        ENGINE_DIRECTION_RIGHT = 1;
+        }
+       lcd_gotoxy(0,1); 
+       
+       
+        puts("L:");
+         itoa(wheelEncoderCounter_left,str);
+         puts(str);
+         puts(" R:");
+         itoa(wheelEncoderCounter_right,str);
+         puts(str);    
+         
+       if(!BUMPER_RIGHT){   
+       delay_ms(250);  
+       engine_dir = !engine_dir;
+       }      
+ }
+ 
+ void STATE_LIGHTSENSOR(){ 
+ int right = LIGHT_SENSOR_RIGHT;
+ int left = LIGHT_SENSOR_LEFT;  
+ char str[10];
+   
+ lcd_clear();
+
+         puts("LEFT:");
+         itoa(left,str);
+         puts(str);
+         lcd_gotoxy(0,1);
+         puts("RIGHT:");
+         itoa(right,str);
+         puts(str);
+ }   
+ 
+ void STATE_LINE_SENSOR(){
+         lcd_clear();
+   
+   if(!LINE_DETECTOR_LEFT)
+     lcd_puts("LEFT: 1");
+   else  
+     lcd_puts("LEFT: 0");
+   if(!LINE_DETECTOR_RIGHT)
+     lcd_puts(" RIGHT: 1");
+   else  
+     lcd_puts(" RIGHT: 0");
+      
+   lcd_gotoxy(0,1);
+   
+   if(!LINE_DETECTOR_MID_LEFT)
+     lcd_puts("MLEFT: 1");
+   else  
+     lcd_puts("MLEFT: 0");
+   if(!LINE_DETECTOR_MID_RIGHT)
+     lcd_puts("MRIGHT:1");
+   else  
+     lcd_puts("MRIGHT:0");       
+ }
+  
+ void STATE_WIICAM(){
+      char str[10];
+      lcd_clear();
+      wii_cam_read(); 
+      itoa(wiicamstate,str);     
+      puts(str);                 
+      puts(":");
+      itoa(WiiCamData.coord_X[wiicamstate],str); 
+      puts("  X:");
+      puts(str);
+      itoa(WiiCamData.coord_Y[wiicamstate],str);
+      puts("Y:");
+      puts(str);
+      itoa(WiiCamData.size[wiicamstate],str);     
+      lcd_gotoxy(0,1);
+      puts("Size:");
+      puts(str); 
+      delay_ms(50);
+       if(!BUMPER_RIGHT){   
+       delay_ms(250);  
+       wiicamstate = wiicamstate < 3 ? wiicamstate + 1 : 0;
+       }      
+ }
+
+
+void STATE_MACHINE(){
+        
+        ENGINE_ENABLE_RIGHT = 0;  
+        ENGINE_ENABLE_LEFT = 0;
+        
+       switch(state){
+              
+       case state_distance_sensor: 
+              if(state_info == 0){    
+                lcd_puts("DISTANZ SENSOR");
+                delay_ms(1000);
+                lcd_clear();
+                state_info = 1;
+                }
+              STATE_DISTANCE_SENSOR();     
+       break;
+       case state_engine:         
+              if(state_info == 0){
+                lcd_puts("MOTOREN");
+                delay_ms(1000);
+                lcd_clear();
+                state_info = 1;
+                }
+              STATE_ENGINE();
+       break;
+       case state_lightsensor: 
+              if(state_info == 0){
+                  lcd_puts("LICHT SENSOR");
+                  delay_ms(1000);
+                  lcd_clear();
+                  state_info = 1;
+                }
+              STATE_LIGHTSENSOR();
+       break;
+       case state_linedetector:  
+              if(state_info == 0){
+                lcd_puts("LINIEN SENSOR");
+                delay_ms(1000);
+                lcd_clear();
+                state_info = 1;
+                }
+              STATE_LINE_SENSOR();
+       break; 
+       case state_wiicam:
+                if(state_info == 0){
+                lcd_puts("WII CAM");
+                delay_ms(1000);
+                lcd_clear();
+                state_info = 1;
+                }
+              STATE_WIICAM();
+       break;
+       default: 
+          lcd_clear();
+           lcd_puts("TEST - PROGRAMM");
+      }                                
+       delay_ms(50);
+}
+
+void main(void)
+{
+
+init();
+
+while (1)
+      {          
+           STATE_MACHINE();     
+      
+       if(!BUMPER_LEFT){   
+       delay_ms(250); 
+       lcd_clear();
+       
+       if(state+1 > state_stop) {
+       state = 0;         
+       }
+       else {
+       state++;
+       } 
+       
+       state_info = 0;
+      }
+       
+     
+}
+
+}

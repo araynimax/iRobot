@@ -1,0 +1,7 @@
+VERSION:3 SOURCE_TIMESTAMP:4B831363
+NODE:V LEVEL:0 LINE:4 "wheelEncoder -> RAM:????"
+LEVEL:1 LINE:2 ICON:S "left"
+LEVEL:1 LINE:3 ICON:S "right"
+NODE:F LEVEL:0 LINE:7 "ext_int4_isr(void)"
+NODE:F LEVEL:0 LINE:13 "ext_int6_isr(void)"
+NODE:F LEVEL:0 LINE:18 "wheelencoder_init(void)"

@@ -1,2 +1,0 @@
-# iRobot
-a school project
