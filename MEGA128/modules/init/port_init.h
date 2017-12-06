@@ -54,7 +54,7 @@
 //NOT IN USE #define PORTD.4
 //NOT IN USE #define PORTD.5
 //NOT IN USE #define PORTD.6
-//NOT IN USE #define PORTD.7
+#define ULTRASONIC_SENSOR_SERVO     PORTD.7
 
 /**
  * Port E
@@ -78,7 +78,7 @@
 #define LINE_DETECTOR_MID_LEFT       PINF.2
 #define LIGHT_SENSOR_RIGHT           adc_data[3]
 #define LINE_DETECTOR_MID_RIGHT      PINF.4
-#define ULTRASONIC_SENSOR_SERVO     PORTF.5
+//NOT IN USE #define PORTF.5
 #define LINE_DETECTOR_RIGHT          PINF.6
 //NOT IN USE #define PORTF.7
 

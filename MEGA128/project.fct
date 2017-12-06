@@ -6,4 +6,5 @@ lcd_puts DSTACK_USAGE:3 DSTACK_LEVEL:21 FILE:"G:\Programme\cvavr\lib\lcd.lib" LI
 lcd_putchar DSTACK_USAGE:1 DSTACK_LEVEL:22 FILE:"G:\Programme\cvavr\lib\lcd.lib" LINE:178
 lcd_gotoxy DSTACK_USAGE:2 DSTACK_LEVEL:24 FILE:"G:\Programme\cvavr\lib\lcd.lib" LINE:158
 _lcd_write_data DSTACK_USAGE:1 DSTACK_LEVEL:25 FILE:"G:\Programme\cvavr\lib\lcd.lib" LINE:77
-twi_int_handler DSTACK_USAGE:18 DSTACK_LEVEL:43 FILE:"" LINE:241
+timer2_ovf_isr DSTACK_USAGE:12 DSTACK_LEVEL:37 FILE:"modules\init\ultrasonic_servo_init.h" LINE:15
+checkAngle DSTACK_USAGE:6 DSTACK_LEVEL:43 FILE:"modules\init\ultrasonic_servo_init.h" LINE:25

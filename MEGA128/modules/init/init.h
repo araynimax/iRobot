@@ -6,6 +6,7 @@
 #include "wii_cam_init.h"
 #include "wheelencoder_init.h"
 #include "ultrasonic_init.h"
+#include "ultrasonic_servo_init.h"
 #include "rc5_init.h";
 #include "wheels_init.h"
 #include "esp_datatransfer_init.h"
