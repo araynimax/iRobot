@@ -61,12 +61,19 @@ void DEMOSTATE_RC5(){
 
 void DEMOSTATE_ULTRASONIC(){
    char str[16];
-    lcd_clear();
-    itoa(ultrasonic_data.distance,str);
-    lcd_puts(" Distance in CM");
-    lcd_gotoxy(0,1);
-    lcd_puts(str);
-    delay_ms(50);
+   static int i = -90;
+   lcd_clear();
+   itoa(i,str);
+   lcd_puts(str);
+   lcd_puts(" Grad");
+   ultrasonic_servo_angle = i++;
+   lcd_gotoxy(0,1);
+   itoa(ultrasonic_data.distance,str);
+   lcd_puts(str);
+   lcd_puts(" CM");
+    if(i == 90)
+    i = -90;
+    delay_ms(80);
 }
 
 void DEMOSTATE_DISTANCE_SENSOR(){

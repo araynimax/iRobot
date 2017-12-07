@@ -76,7 +76,7 @@ void timer_init()
      * BIT 1: CS11
      * BIT 0: CS10
      */
-    TCCR1B = 0b00000000;
+    TCCR1B = 0b00000010;
 
     /**
    * >>> Counter Register (High/Low Byte) <<<
@@ -104,7 +104,7 @@ void timer_init()
     OCR1CL = 0x00;
 
     /**
-     *  >>>>>>>>>> Timer/Counter 2 initialization <<<<<<<<<<<< 
+     *  >>>>>>>>>> Timer/Counter 2 initialization <<<<<<<<<<<<
      * Ultrasonic Servo
      */
 
@@ -210,7 +210,7 @@ void timer_init()
      * BIT 1: OCIE0
      * BIT 0: TOIE0
      */
-    TIMSK = 0b01000001;
+    TIMSK = 0b01000101;
 
     /**
      *

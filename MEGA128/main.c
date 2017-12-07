@@ -29,9 +29,10 @@ Data Stack size         : 1024
 
 void main(void)
 {
-
 initialize();
 demo();
+move(100,50);
+
 while(1){
 
 }

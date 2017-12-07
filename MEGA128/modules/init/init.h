@@ -19,6 +19,7 @@ void initialize(){
    wii_cam_init();
    adc_init();
    wheelencoder_init();
+   wheels_init();
    ultrasonic_init();
    esp_datatransfer_init();
 }
