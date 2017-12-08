@@ -94,6 +94,15 @@ DDRD  = 0b10000010;
 DDRE  = 0b00000000;
 DDRF  = 0b00100000;
 
+PORTA = 0x00;
+PORTB = 0x00;
+PORTC = 0x00;
+PORTD = 0x00;
+PORTE = 0x00;
+PORTF = 0x00;
+
+
+
 // LCD initialization
 lcd_init(16);
 }

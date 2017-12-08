@@ -66,7 +66,7 @@ void DEMOSTATE_ULTRASONIC(){
    itoa(i,str);
    lcd_puts(str);
    lcd_puts(" Grad");
-   ultrasonic_servo_angle = i++;
+   //ultrasonic_servo_angle = i++;
    lcd_gotoxy(0,1);
    itoa(ultrasonic_data.distance,str);
    lcd_puts(str);

@@ -69,60 +69,56 @@ void wheels_init(){
 
 
 
-
+/**
+ * LEFT WHEEL
+ */
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)
-{
-  ENGINE_ENABLE_RIGHT = 1;
-   ENGINE_ENABLE_LEFT = 1;
-}
-
-
-
-interrupt [TIM1_COMPB] void timer1_compb_isr(void)
 {
   ENGINE_ENABLE_LEFT = 0;
 }
 
 
-interrupt [TIM1_COMPC] void timer1_compc_isr(void)
+/**
+ * LEFT RIGHT
+ */
+interrupt [TIM1_COMPB] void timer1_compb_isr(void)
 {
-ENGINE_ENABLE_RIGHT = 0;
+  ENGINE_ENABLE_RIGHT = 0;
 }
 
 
 interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 {
-  // if(wheelEncoder.left < WheelMoving.encoder_changes){
-  //   if(WheelMoving.movement_type == wheel_movement_type_move){
-  //     ENGINE_ENABLE_RIGHT = 1;
-  //     ENGINE_ENABLE_LEFT = 1;
-  //     if(WheelMoving.backwards == 1){
-  //       ENGINE_DIRECTION_RIGHT = 1;
-  //       ENGINE_DIRECTION_LEFT = 1;
-  //     }
-  //     else{
-  //       ENGINE_DIRECTION_RIGHT = 0;
-  //       ENGINE_DIRECTION_LEFT = 0;
-  //     }
-  //   }
-  //   else if(WheelMoving.movement_type == wheel_movement_type_rotate){
-  //     ENGINE_ENABLE_RIGHT = 1;
-  //     ENGINE_ENABLE_LEFT = 1;
-  //     if(WheelMoving.clockwise == 1){
-  //       ENGINE_DIRECTION_RIGHT = 1;
-  //       ENGINE_DIRECTION_LEFT = 0;
-  //     }
-  //     else{
-  //       ENGINE_DIRECTION_RIGHT = 0;
-  //       ENGINE_DIRECTION_LEFT = 1;
-  //     }
-  //   }
-  // }
-  // else{
-  //   ENGINE_ENABLE_RIGHT = 0;
-  //   ENGINE_ENABLE_LEFT = 0;
-  //   ENGINE_DIRECTION_RIGHT = 0;
-  //   ENGINE_DIRECTION_LEFT = 0;
-  // }
-
+  if(wheelEncoder.left < WheelMoving.encoder_changes){
+    if(WheelMoving.movement_type == wheel_movement_type_move){
+      ENGINE_ENABLE_RIGHT = 1;
+      ENGINE_ENABLE_LEFT = 1;
+      if(WheelMoving.backwards == 1){
+        ENGINE_DIRECTION_RIGHT = 1;
+        ENGINE_DIRECTION_LEFT = 1;
+      }
+      else{
+        ENGINE_DIRECTION_RIGHT = 0;
+        ENGINE_DIRECTION_LEFT = 0;
+      }
+    }
+    else if(WheelMoving.movement_type == wheel_movement_type_rotate){
+      ENGINE_ENABLE_RIGHT = 1;
+      ENGINE_ENABLE_LEFT = 1;
+      if(WheelMoving.clockwise == 1){
+        ENGINE_DIRECTION_RIGHT = 1;
+        ENGINE_DIRECTION_LEFT = 0;
+      }
+      else{
+        ENGINE_DIRECTION_RIGHT = 0;
+        ENGINE_DIRECTION_LEFT = 1;
+      }
+    }
+  }
+  else{
+    ENGINE_ENABLE_RIGHT = 0;
+    ENGINE_ENABLE_LEFT = 0;
+    ENGINE_DIRECTION_RIGHT = 0;
+    ENGINE_DIRECTION_LEFT = 0;
+  }
 }

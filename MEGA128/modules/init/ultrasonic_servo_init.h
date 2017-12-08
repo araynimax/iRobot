@@ -4,13 +4,15 @@
 
 #define ULTRASONIC_RANGE_DEGREE 180
 
-int ultrasonic_servo_angle = 30;  //range is -90° to +90°
+int ultrasonic_servo_angle = 0;  //range is -90° to +90°
 int ultrasonic_servo_angle_copy = 0;
 int ultrasonic_servo_breaks;
 bit ultrasonic_servo_init = 1;
 
 int checkAngle(int*);
 int ULTRASONIC_CALC_TIMER_VALUE(int);
+
+char str[10];
 
 interrupt [TIM2_OVF] void timer2_ovf_isr(void){
   ULTRASONIC_SENSOR_SERVO = 0;

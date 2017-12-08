@@ -46,6 +46,7 @@ void timer_init()
 
     /**
      * >>>>>>>>>> Timer/Counter 1 initialization <<<<<<<<<<<<
+     * Motorsteuerung
      */
 
     /**
@@ -61,7 +62,7 @@ void timer_init()
      * BIT 1: WGM11
      * BIT 0: WGM10
      */
-    TCCR1A = 0b00000000;
+    TCCR1A = 0b00000001;
 
     /**
      *
@@ -76,7 +77,7 @@ void timer_init()
      * BIT 1: CS11
      * BIT 0: CS10
      */
-    TCCR1B = 0b00000010;
+    TCCR1B = 0b00000100;
 
     /**
    * >>> Counter Register (High/Low Byte) <<<
@@ -210,7 +211,7 @@ void timer_init()
      * BIT 1: OCIE0
      * BIT 0: TOIE0
      */
-    TIMSK = 0b01000101;
+    TIMSK = 0b01011101;
 
     /**
      *
@@ -225,5 +226,5 @@ void timer_init()
      * BIT 1: OCIEC
      * BIT 0: OCIE1C
      */
-    ETIMSK = 0b00110000;
+    ETIMSK = 0b00110001;
 }
