@@ -107,13 +107,13 @@ char str[10];
             lcd_clear();
      if(engine_dir == 0){
        lcd_puts("     ENCODER  >>");
-       ENGINE_DIRECTION_LEFT = 0;
-       ENGINE_DIRECTION_RIGHT = 0;
+       ENGINE_BACKWARDS_LEFT = 0;
+       ENGINE_BACKWARDS_RIGHT = 0;
        }
      else{
        lcd_puts("<<   ENCODER    ");
-       ENGINE_DIRECTION_LEFT = 1;
-       ENGINE_DIRECTION_RIGHT = 1;
+       ENGINE_BACKWARDS_LEFT = 1;
+       ENGINE_BACKWARDS_RIGHT = 1;
        }
       lcd_gotoxy(0,1);
 
