@@ -9,9 +9,9 @@
 #define REMOTE_CONTROL               PINA.2
 #define ENGINE_ENABLE_LEFT          PORTA.3
 #define BUMPER_LEFT                  PINA.4
-#define ENGINE_DIRECTION_RIGHT      PORTA.5
+#define ENGINE_BACKWARDS_RIGHT      PORTA.5
 #define BUMPER_RIGHT                 PINA.6
-#define ENGINE_DIRECTION_LEFT       PORTA.7
+#define ENGINE_BACKWARDS_LEFT       PORTA.7
 
 /**
  * Port B
