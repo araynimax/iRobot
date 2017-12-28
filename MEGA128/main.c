@@ -24,26 +24,39 @@ Data Stack size         : 1024
 #include <mega128.h>
 #include <delay.h>
 #include <stdlib.h>
+
+//#define max(a,b) a>b ? a : b
+
 #include "modules/init/init.h"
 #include "modules/demo.h"
 
+
+
 void main(void)
 {
-  int counter = 0;
-initialize();
+  char str[10];
+  int changes = 0,i;
+      initialize();
+      delay_ms(5000);
+      move(3000,200);
+       rotate(90,150);
+       move(1000,200);
+       rotate(180,150);  
+       move(1000,200);
+       rotate(-90,150);
+       move(3000,200);
+             
 
 
-move(10000,100);
+
+
+
+
 while(1){
-  counter = counter < 300 ? counter+1 : 0;
-  OCR1BL = counter < 255 ? counter : 255;
-  OCR1CL = counter < 255 ? counter : 255;
-  delay_ms(50);
-  lcd_clear();
-  debug(counter < 255 ? counter : 255);
-  lcd_gotoxy(0,1);
-  debug(wheelEncoder.left);
-  lcd_puts(":");
-  debug(wheelEncoder.right);
+
+
 }
+
+
+
 }
