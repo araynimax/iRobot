@@ -9,13 +9,17 @@
 #define wheel_encoder_amount_black 30
 
 //robot
-#define robot_diameter 150  //With wheels
+#define robot_diameter 134  //Without wheels
+//#define robot_diameter 143  //With half wheels
+//#define robot_diameter 150  //With  wheels
+
+
 
 //Math
 #define PI 3.141592654
 
 // Calculations
-#define wheel_circumference (2 * PI * (wheel_diameter + wheel_rubber / 2.0))
+#define wheel_circumference (PI * (wheel_diameter + wheel_rubber))
 #define robot_circumference (PI * robot_diameter)
 #define wheel_encoder_amount (wheel_encoder_amount_white + wheel_encoder_amount_black)
 
