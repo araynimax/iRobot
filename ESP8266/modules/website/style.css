@@ -1,0 +1,45 @@
+@import url("./awesomespinner.min.css");
+
+.loadingScreen{
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  background: #efeff4;
+}
+
+.loadingScreen .awesome-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  /*should be 1:1*/
+  height: 160px;
+  width: 160px;
+
+  transform: translate(-50%, -80%);
+
+  /*spinner color*/
+  border-color: black;
+
+}
+
+.loadingScreen .text{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 500%);
+  color: black;
+}
+
+.loadingScreen .text.failed::after{
+  content: "failed!";
+  color: red;
+}
+
+.loadingScreen.hidden{
+display: none;
+}
+
+ons-tabbar{
+  z-index: -1;
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+<title>ESP8266 Web Server</title>
+
+<link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+<link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+
+
+<link rel="stylesheet" href="style.css">
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+
+</head>
+
+<body>
+<ons-page>
+
+  <ons-toolbar>
+    <div class="center">iRobot</div>
+  </ons-toolbar>
+  <div class="loadingScreen">
+  <div class="awesome-spinner"></div>
+  <div class="text">Connecting to WebSocket...</div>
+  </div>
+  <ons-tabbar swipeable position="auto">
+    <ons-tab page="homeTab" label="Home" icon="ion-home, material:md-home" active></ons-tab>
+    <ons-tab page="controllTab" label="Control" icon="fa-gamepad"></ons-tab>
+      <ons-tab page="infoTab" label="Info" icon="fa-info"></ons-tab>
+  </ons-tabbar>
+
+</ons-page>
+
+<template id="homeTab">
+  <ons-page id="homeTab">
+
+    <p style="text-align: center;">
+
+    </p>
+  </ons-page>
+</template>
+
+<template id="controllTab">
+  <ons-page id="controllTab">
+    <p style="text-align: center;">
+
+    </p>
+  </ons-page>
+</template>
+
+<template id="infoTab">
+  <ons-page id="infoTab">
+     <ons-list id="robot-info">
+
+     </ons-list>
+  </ons-page>
+</template>
+
+
+<script src="socket.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
