@@ -34,28 +34,14 @@ Data Stack size         : 1024
 
 void main(void)
 {
-  char str[10];
-  int changes = 0,i;
-      initialize();
-      delay_ms(5000);
-      move(3000,200);
-       rotate(90,150);
-       move(1000,200);
-       rotate(180,150);  
-       move(1000,200);
-       rotate(-90,150);
-       move(3000,200);
-             
-
-
-
-
+  initialize();
+//demo();
 
 
 while(1){
+        
+}      
 
-
-}
 
 
 

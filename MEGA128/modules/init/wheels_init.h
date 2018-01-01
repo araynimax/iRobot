@@ -39,6 +39,20 @@ struct structWheelMoving{
   int force;
 } WheelMoving;
 
+
+
+int checkSensors(){
+  if(!BUMPER_LEFT || !BUMPER_RIGHT || !DISTANCE_SENSOR_FRONT_LEFT || !DISTANCE_SENSOR_FRONT_RIGHT)
+    return 1;
+  return 0;
+}
+void handleCollisionObject(){
+
+}
+
+
+
+
 /*
 struct structWheelSpeed{
   unsigned int timer_counter;
@@ -54,7 +68,8 @@ struct structCompares{
   int left;
   int right;
   int leftcpy;
-  int rightcpy;
+  int rightcpy;  
+  int hindernis;
 } Wheel_Compare;
 
 char debugstr[10];
@@ -85,7 +100,7 @@ if(WheelMovingQueueLength > 0){
   WheelMoving.clockwise       = WheelMovingQueue[0].clockwise;
   movement_type   =             WheelMovingQueue[0].movement_type;
   WheelMoving.force           = WheelMovingQueue[0].force;
-   lcd_clear();
+   //lcd_clear();
   if(movement_type == wheel_movement_type_move) lcd_puts("[M]>");
    else lcd_puts("[R]>");
   for(i = 0; i < WheelMovingQueueLength; i++){
@@ -185,7 +200,7 @@ void wheels_init(){
 
 
 
-
+//@todo bremsen
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)
 {
   if(WheelMoving.movement_type == wheel_movement_type_move){
@@ -209,6 +224,15 @@ interrupt [TIM1_COMPA] void timer1_compa_isr(void)
      execNextQueue();
   }
 
+  if(checkSensors()){
+    ENGINE_ENABLE_RIGHT = 0;
+    ENGINE_ENABLE_LEFT = 0;
+    handleCollisionObject();          
+    Wheel_Compare.hindernis = 1;
+  } 
+  else
+  Wheel_Compare.hindernis = 0;
+
 }
 
 
@@ -227,7 +251,6 @@ ENGINE_ENABLE_RIGHT = 0;
 
 interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 {
-  //calculateEngineSpeed();
   if(Wheel_Compare.left < WheelMoving.force){
      Wheel_Compare.left++;
 	 Wheel_Compare.leftcpy++;
@@ -254,11 +277,6 @@ interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 
    else if (Wheel_Compare.left>100)
      Wheel_Compare.left--;
-  }
-  /*Macht meiner Meinung nacht sinn ob ein hin und her zu verhidnern*/
-  else{
-	  Wheel_Compare.left = Wheel_Compare.leftcpy;
-	  Wheel_Compare.right = Wheel_Compare.rightcpy;
   }
 
   OCR1BL = Wheel_Compare.left;
