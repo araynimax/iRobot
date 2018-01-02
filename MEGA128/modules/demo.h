@@ -11,7 +11,7 @@
 #define demostate_rc5  6
 #define demostate_stop 7
 
-int state = demostate_stop;
+int state = demostate_rc5;
 int state_info = 0;
 
 int engine_dir = 0;
@@ -66,7 +66,7 @@ void DEMOSTATE_ULTRASONIC(){
    itoa(i,str);
    lcd_puts(str);
    lcd_puts(" Grad");
-   //ultrasonic_servo_angle = i++;
+   ultrasonic_servo.angle = i++;
    lcd_gotoxy(0,1);
    itoa(ultrasonic_data.distance,str);
    lcd_puts(str);

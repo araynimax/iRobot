@@ -4,6 +4,8 @@
 #define PULSE_1_2	(unsigned char)(XTAL / 512 * RC5TIME * 0.8 + 0.5)
 #define PULSE_MAX	(unsigned char)(XTAL / 512 * RC5TIME * 1.2 + 0.5)
 
+
+//@todo umstrukturieren
  bit	         rc5_bit=1;			// bit value
  unsigned char rc5_time=0;			// count bit time
  unsigned int  rc5_data=0;			// store result
@@ -15,7 +17,6 @@
 
 
 //Timer 0 overflow interrupt service routine
-
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
   TCNT0 = 254;					// 2 * 256 = 512 cycle
@@ -63,4 +64,12 @@ int rc5_receive()
   }
   else
     return -1;
+}
+
+void rc5_init(){
+  ASSR   = (0 << AS0) | (0 << TCN0UB) | (0 << OCR0UB) | (0 << TCR0UB);
+  TCCR0  = (0 << FOC0) | (0 << WGM00) | (0 << COM01) | (0 << COM00) | (0 << WGM01) | (1 << CS02) | (1 << CS01) | (0 << CS00);
+  TCNT0  = 0x00;
+  OCR0   = 0x00;
+  TIMSK |= (1 << TOIE0 ) | (0 << OCIE0);
 }

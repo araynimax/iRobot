@@ -91,7 +91,7 @@ unsigned char slave_tx_handler(bool tx_complete) {
   tx_buffer.data.sensor.wheelencoder_left = wheelEncoder.left;
   tx_buffer.data.sensor.wheelencoder_right = wheelEncoder.right;
   //Ultrasonic
-  tx_buffer.data.sensor.ultrasonic_angle = ultrasonic_servo_angle;
+  tx_buffer.data.sensor.ultrasonic_angle = ultrasonic_servo.angle;
   tx_buffer.data.sensor.ultrasonic_distance = ultrasonic_data.distance;
   //Distance sensor
   tx_buffer.data.sensor.distance_right = DISTANCE_SENSOR_RIGHT;
@@ -124,9 +124,7 @@ unsigned char slave_tx_handler(bool tx_complete) {
   // transmission from slave to master has already started,
   // no more bytes to send in this transaction
   if (esp_datatransfer_received_ok) {
-    ultrasonic_servo_angle = rx_buffer.data.sensor.ultrasonic_angle;
-    lcd_clear();
-    debug(ultrasonic_servo_angle);
+    ultrasonic_servo.angle = rx_buffer.data.sensor.ultrasonic_angle;
   }
   return 0;
 }

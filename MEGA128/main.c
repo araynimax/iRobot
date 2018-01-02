@@ -27,7 +27,7 @@ Data Stack size         : 1024
 
 //#define max(a,b) a>b ? a : b
 
-#include "modules/init/init.h"
+#include "modules/init.h"
 #include "modules/demo.h"
 
 
@@ -35,12 +35,12 @@ Data Stack size         : 1024
 void main(void)
 {
   initialize();
-//demo();
+  demo();
 
 
 while(1){
-        
-}      
+
+}
 
 
 
