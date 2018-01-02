@@ -13,11 +13,6 @@
 //#define robot_diameter 143  //With half wheels
 //#define robot_diameter 150  //With  wheels
 
-
-
-//Math
-#define PI 3.141592654
-
 // Calculations
 #define wheel_circumference (PI * (wheel_diameter + wheel_rubber))
 #define robot_circumference (PI * robot_diameter)
@@ -50,25 +45,11 @@ void handleCollisionObject(){
 
 }
 
-
-
-
-/*
-struct structWheelSpeed{
-  unsigned int timer_counter;
-  unsigned int timer_counter_before;
-  unsigned int timer_counter_after;
-  unsigned int encoderLeft;
-  unsigned int encoderRight;
-  float speed;
-} WheelSpeed;
-*/
-
 struct structCompares{
   int left;
   int right;
   int leftcpy;
-  int rightcpy;  
+  int rightcpy;
   int hindernis;
 } Wheel_Compare;
 
@@ -100,18 +81,13 @@ if(WheelMovingQueueLength > 0){
   WheelMoving.clockwise       = WheelMovingQueue[0].clockwise;
   movement_type   =             WheelMovingQueue[0].movement_type;
   WheelMoving.force           = WheelMovingQueue[0].force;
-   //lcd_clear();
-  if(movement_type == wheel_movement_type_move) lcd_puts("[M]>");
-   else lcd_puts("[R]>");
+
   for(i = 0; i < WheelMovingQueueLength; i++){
     WheelMovingQueue[i].encoder_changes = WheelMovingQueue[i + 1].encoder_changes;
     WheelMovingQueue[i].movement_type = WheelMovingQueue[i + 1].movement_type;
     WheelMovingQueue[i].clockwise = WheelMovingQueue[i + 1].clockwise;
     WheelMovingQueue[i].backwards = WheelMovingQueue[i + 1].backwards;
     WheelMovingQueue[i].force = WheelMovingQueue[i + 1].force;
-    if(WheelMovingQueue[i]. movement_type == wheel_movement_type_move) lcd_puts("M");
-    else lcd_puts("R");
-    if(i < WheelMovingQueueLength - 1) lcd_puts(">");
 }
 
   wheelEncoder.left = 0;
@@ -125,7 +101,7 @@ if(WheelMovingQueueLength > 0){
 }
 }
 
-int calculateBrakedistance(int x){
+int calculateBrakeDistance(int x){
   return 26.0 / (1.0 + 862.79 * pow(2.7182818284590452353602874713526625,-0.05 * x));
 }
 
@@ -171,7 +147,7 @@ void calculateEngineSpeed(){
  */
 //@todo geschwindigkeit
 int move(float mm,unsigned int force){
-    int encoder_changes = ((mm < 0 ? mm * (-1) : mm)  / (float) ((float) wheel_circumference /  (float) wheel_encoder_amount)) - calculateBrakedistance(force);
+    int encoder_changes = ((mm < 0 ? mm * (-1) : mm)  / (float) ((float) wheel_circumference /  (float) wheel_encoder_amount)) - calculateBrakeDistance(force);
     addQueue(encoder_changes,wheel_movement_type_move,mm,force);
     return  encoder_changes;
 }
@@ -182,22 +158,10 @@ int move(float mm,unsigned int force){
  */
 //@todo geschwindigkeit
 int rotate(float degree,unsigned int force){
-  int encoder_changes =  robot_circumference / 360.0 / ( (float) wheel_circumference /  (float) wheel_encoder_amount) *  (degree < 0 ? degree * (-1.0): degree) - 4;  // -calculateBrakedistance(force);
+  int encoder_changes =  robot_circumference / 360.0 / ( (float) wheel_circumference /  (float) wheel_encoder_amount) *  (degree < 0 ? degree * (-1.0): degree) - 4;  // -calculateBrakeDistance(force);
   addQueue(encoder_changes,wheel_movement_type_rotate,degree,force);
   return  encoder_changes;
 }
-
-void wheels_init(){
-  WheelMoving.movement_type = wheel_movement_type_stop;
-  Wheel_Compare.left  = wheel_start_value;
-  Wheel_Compare.right = wheel_start_value;
-  Wheel_Compare.leftcpy  = wheel_start_value;
-  Wheel_Compare.rightcpy = wheel_start_value;
-  //WheelSpeed.timer_counter = 0;
-  //WheelSpeed.encoderLeft =  wheelEncoder.left;
-  //WheelSpeed.encoderRight =  wheelEncoder.right;
-}
-
 
 
 //@todo bremsen
@@ -227,9 +191,9 @@ interrupt [TIM1_COMPA] void timer1_compa_isr(void)
   if(checkSensors()){
     ENGINE_ENABLE_RIGHT = 0;
     ENGINE_ENABLE_LEFT = 0;
-    handleCollisionObject();          
+    handleCollisionObject();
     Wheel_Compare.hindernis = 1;
-  } 
+  }
   else
   Wheel_Compare.hindernis = 0;
 
@@ -281,4 +245,28 @@ interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 
   OCR1BL = Wheel_Compare.left;
   OCR1CL = Wheel_Compare.right;
+}
+
+
+void wheels_init(){
+  TCCR1A  = (0 << COM1A1) |(0 << COM1A0) |(0 << COM1B1) |(0 << COM1B0) |(0 << COM1C1) |(0 << COM1C0) |(0 << WGM11) |(1 << WGM10);
+  TCCR1B  = (0 << ICNC1) |(0 << ICES1) |(0 << WGM13) |(0 << WGM12) |(1 << CS12) |(0 << CS11) |(0 << CS10);
+  TCNT1H  = 0x00;
+  TCNT1L  = 0x00;
+  ICR1H   = 0x00;
+  ICR1L   = 0x00;
+  OCR1AH  = 0x00;
+  OCR1AL  = 0x00;
+  OCR1BH  = 0x00;
+  OCR1BL  = 0x00;
+  OCR1CH  = 0x00;
+  OCR1CL  = 0x00;
+  TIMSK  |= (1 << TICIE1) |(1 << OCIE1A) |(1 << OCIE1B) |(1 << TOIE1);
+  ETIMSK |= (1 << OCIE1C);
+
+  WheelMoving.movement_type = wheel_movement_type_stop;
+  Wheel_Compare.left  = wheel_start_value;
+  Wheel_Compare.right = wheel_start_value;
+  Wheel_Compare.leftcpy  = wheel_start_value;
+  Wheel_Compare.rightcpy = wheel_start_value;
 }
