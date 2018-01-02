@@ -4,6 +4,8 @@
 #define PULSE_1_2	(unsigned char)(XTAL / 512 * RC5TIME * 0.8 + 0.5)
 #define PULSE_MAX	(unsigned char)(XTAL / 512 * RC5TIME * 1.2 + 0.5)
 
+
+//@todo umstrukturieren
  bit	         rc5_bit=1;			// bit value
  unsigned char rc5_time=0;			// count bit time
  unsigned int  rc5_data=0;			// store result
