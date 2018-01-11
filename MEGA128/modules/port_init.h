@@ -73,13 +73,13 @@
  * Port F
  */
 
-#define LINE_DETECTOR_LEFT           PINF.0
+#define LINE_DETECTOR_LEFT           adc_data[0] > 500
 #define LIGHT_SENSOR_LEFT            adc_data[1]
-#define LINE_DETECTOR_MID_LEFT       PINF.2
+#define LINE_DETECTOR_MID_LEFT       adc_data[2] > 500
 #define LIGHT_SENSOR_RIGHT           adc_data[3]
-#define LINE_DETECTOR_MID_RIGHT      PINF.4
+#define LINE_DETECTOR_MID_RIGHT      adc_data[4] > 500
 //NOT IN USE #define PORTF.5
-#define LINE_DETECTOR_RIGHT          PINF.6
+#define LINE_DETECTOR_RIGHT          adc_data[6] > 500
 //NOT IN USE #define PORTF.7
 
 

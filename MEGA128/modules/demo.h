@@ -11,7 +11,7 @@
 #define demostate_rc5  6
 #define demostate_stop 7
 
-int state = demostate_rc5;
+int state = demostate_distance_sensor;
 int state_info = 0;
 
 int engine_dir = 0;
@@ -73,7 +73,6 @@ void DEMOSTATE_ULTRASONIC(){
    lcd_puts(" CM");
     if(i == 90)
     i = -90;
-    delay_ms(80);
 }
 
 void DEMOSTATE_DISTANCE_SENSOR(){
@@ -148,27 +147,22 @@ lcd_clear();
 }
 
 void DEMOSTATE_LINE_SENSOR(){
+     char str[10];
         lcd_clear();
-
-  if(!LINE_DETECTOR_LEFT)
-    lcd_puts("LEFT: 1");
-  else
-    lcd_puts("LEFT: 0");
-  if(!LINE_DETECTOR_RIGHT)
-    lcd_puts(" RIGHT: 1");
-  else
-    lcd_puts(" RIGHT: 0");
-
+    lcd_puts("L:");
+    itoa(LINE_DETECTOR_LEFT,str);
+    lcd_puts(str);
+    lcd_puts(" R:");
+    itoa(LINE_DETECTOR_RIGHT,str);
+    lcd_puts(str);
   lcd_gotoxy(0,1);
 
-  if(!LINE_DETECTOR_MID_LEFT)
-    lcd_puts("MLEFT: 1");
-  else
-    lcd_puts("MLEFT: 0");
-  if(!LINE_DETECTOR_MID_RIGHT)
-    lcd_puts("MRIGHT:1");
-  else
-    lcd_puts("MRIGHT:0");
+    lcd_puts("ML:");
+    itoa(LINE_DETECTOR_MID_LEFT,str);
+    lcd_puts(str);
+    lcd_puts("MR:");
+    itoa(LINE_DETECTOR_MID_RIGHT,str);
+    lcd_puts(str);
 }
 
 void DEMOSTATE_WIICAM(){
