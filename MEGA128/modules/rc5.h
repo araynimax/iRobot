@@ -68,7 +68,7 @@ int rc5_receive()
 
 void rc5_init(){
   ASSR   = (0 << AS0) | (0 << TCN0UB) | (0 << OCR0UB) | (0 << TCR0UB);
-  TCCR0  = (0 << FOC0) | (0 << WGM00) | (0 << COM01) | (0 << COM00) | (0 << WGM01) | (1 << CS02) | (1 << CS01) | (0 << CS00);
+  TCCR0  = (1 << CS02) | (1 << CS01) | (0 << CS00);
   TCNT0  = 0x00;
   OCR0   = 0x00;
   TIMSK |= (1 << TOIE0 ) | (0 << OCIE0);
