@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
 <title>ESP8266 Web Server</title>
 
-<link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
-<link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+<link rel="stylesheet" href="onsenui.css">
+<link rel="stylesheet" href="onsen-css-components.min.css">
 
 
 <link rel="stylesheet" href="style.css">
 
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+<script src="jquery.min.js"></script>
+<script src="onsenui.min.js"></script>
 
 </head>
 
@@ -36,11 +36,8 @@
 </ons-page>
 
 <template id="homeTab">
-  <ons-page id="homeTab">
-
-    <p style="text-align: center;">
-
-    </p>
+  <ons-page id="homeTab" style="text-align: center">
+     <ons-range class="ultrasonic_servo" style="width: 50%;" min="-90" max="90" step="1"></ons-range>
   </ons-page>
 </template>
 
