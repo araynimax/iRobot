@@ -29,11 +29,11 @@ struct TSensor {
   int16_t  light_right;
   int16_t  light_left;
   //rc5value
-  uint8_t  rc5_value;   
+  uint8_t  rc5_value;
     //bumper
   uint8_t  bumper_left;
-  uint8_t  bumper_right;      
-  
+  uint8_t  bumper_right;
+
   uint8_t hindernis;
   //wii cam
   //unsigned int wii_cam_coord_X[4];
@@ -110,9 +110,9 @@ unsigned char slave_tx_handler(bool tx_complete) {
   tx_buffer.data.sensor.rc5_value = rc5_data;
     //bumper
     tx_buffer.data.sensor.bumper_left = BUMPER_LEFT;
-  tx_buffer.data.sensor.bumper_right = BUMPER_RIGHT;          
-  
-   tx_buffer.data.sensor.hindernis = Wheel_Compare.hindernis;
+  tx_buffer.data.sensor.bumper_right = BUMPER_RIGHT;
+
+   tx_buffer.data.sensor.hindernis = 0;//Wheel_Compare.hindernis;
   //wii cam
   // tx_buffer.data.sensor.wii_cam_coord_X = WiiCamData.coord_X;
   // tx_buffer.data.sensor.wii_cam_coord_Y = WiiCamData.coord_Y;
