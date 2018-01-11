@@ -1,7 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WebSocketsServer.h>
 #include <ArduinoJson.h>
-#include <ESPAsyncWebServer.h>
 #include <FS.h>
 #include <Wire.h>
 
@@ -42,6 +41,7 @@ ic2bus_init();
 
 websocket_init();
   webserver_init();
+
 }
 
 
@@ -57,4 +57,5 @@ void loop() {
       sendDataObject(); //Daten über Websocket nur schicken, wenn Verbindung besteht!
     }
   }
+  server.handleClient();
 }
