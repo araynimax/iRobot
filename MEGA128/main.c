@@ -20,7 +20,7 @@ Memory model            : Small
 External RAM size       : 0
 Data Stack size         : 1024
 *******************************************************/
-
+#define PRINT(x) {char str[10];itoa(x,str);lcd_puts(str);}
 #include <mega128.h>
 #include <delay.h>
 #include <stdlib.h>
@@ -31,15 +31,16 @@ Data Stack size         : 1024
 #include "modules/demo.h"
 
 
-
 void main(void)
 {
   initialize();
-  demo();
-
-
-while(1){
-
+  while(1){
+    cyclestate();
+    lcd_clear();
+    PRINT(LIGHT_SENSOR_RIGHT);
+    lcd_gotoxy(0,1);
+    PRINT(LIGHT_SENSOR_LEFT);
+    delay_ms(50);
 }
 
 
