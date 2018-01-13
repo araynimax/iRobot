@@ -1,5 +1,3 @@
-// All defined datas are represented in millimetres!
-
 // wheel
 #define wheel_diameter 100
 #define wheel_rubber   0.5
@@ -18,241 +16,173 @@
 #define robot_circumference (PI * robot_diameter)
 #define wheel_encoder_amount (wheel_encoder_amount_white + wheel_encoder_amount_black)
 
-#define wheel_movement_type_stop 1
-#define wheel_movement_type_move 2
-#define wheel_movement_type_rotate 3
 
-#define wheel_timer_counter_ms 8.16
+//
+#define HandleCollisionState 0
+//
 
-#define wheel_start_value 130
 
-struct structWheelMoving{
-  int encoder_changes;
-  int backwards;
-  int clockwise;
-  int movement_type;
+int WheelTimerCounter = 0;
+
+struct structMotor{
   int force;
-} WheelMoving;
-
-
-
-int checkSensors(){
-  if(!BUMPER_LEFT || !BUMPER_RIGHT || !DISTANCE_SENSOR_FRONT_LEFT || !DISTANCE_SENSOR_FRONT_RIGHT)
-    return 1;
-  return 0;
-}
-void handleCollisionObject(){
-
-}
-
-struct structCompares{
-  int left;
-  int right;
-  int leftcpy;
-  int rightcpy;
-  int hindernis;
-} Wheel_Compare;
-
-char debugstr[10];
-#define debug(integer) itoa(integer,debugstr); lcd_puts(debugstr);
-#define debugFloat(floatValue) ftoa(floatValue,4,debugstr); lcd_puts(debugstr);
-
-struct structQueueItem{
   int encoder_changes;
-  int backwards;
-  int movement_type;
-  int force;
-  int clockwise;
+  int finished;
 };
 
-struct structQueueItem WheelMovingQueue[25];
+struct structQueue{
+  int queueIsEmpty;
+  int right_force;
+  int right_encoder_changes;
+  int left_force;
+  int left_encoder_changes;
+};
 
-int WheelMovingQueueLength = 0;
+struct structMotor MotorRight;
+struct structMotor MotorLeft;
+
+#define MAX_QUEUE_LENGTH 20
+
+struct structQueue MainQueue[MAX_QUEUE_LENGTH];
+int MainQueueLength = -1;
+struct structQueue ObstacleQueue[MAX_QUEUE_LENGTH];
+int ObstacleQueueLength = -1;
+
+int queueModifing = 0;
+
+
+int* getQueueLength(int ForObstacleQueue){
+  return ForObstacleQueue ? &ObstacleQueueLength : &MainQueueLength;
+}
+
+struct structQueue* getQueue(int ForObstacleQueue){
+  return ForObstacleQueue ? ObstacleQueue : MainQueue;
+}
+
+void addToQueue(int force,int value,int isRotation,int isForObstacleQueue){
+  if(*getQueueLength(isForObstacleQueue) < MAX_QUEUE_LENGTH){
+    int encoderChange = isRotation ? (robot_circumference / 360.0 / ( (float) wheel_circumference /  (float) wheel_encoder_amount) *  (value < 0 ? value * (-1.0): value) - 4) : ((value < 0 ? value * (-1) : value)  / (float) ((float) wheel_circumference /  (float) wheel_encoder_amount));
+    int* queueLength = getQueueLength(isForObstacleQueue);
+    struct structQueue* queue = getQueue(isForObstacleQueue);
+    queueModifing = 1;
+    if(*queueLength == -1)(*queueLength)++;
+    queue[*queueLength].right_force = isRotation ? (value < 0 ? force: force  * (-1))  : force;
+    queue[*queueLength].left_force  = isRotation ? (value < 0 ? force *  (-1) : force) : force;
+    queue[*queueLength].right_encoder_changes = encoderChange;
+    queue[*queueLength].left_encoder_changes  = encoderChange;
+    (*queueLength)++;
+  }
+  queueModifing = 0;
+}
+
+void setMotorDistance(int mm,int force){
+  addToQueue(force,mm,0,HandleCollisionState);
+}
+
+void rotateRobot(float degree, int force){
+  addToQueue(force,degree,1,HandleCollisionState);
+}
+
+struct structQueue getNextQueueObject(int shift,int isForObstacleQueue){
+  int* queueLength = getQueueLength(isForObstacleQueue);
+  struct structQueue queueItem;
+  queueItem.queueIsEmpty = 1;
+  if(*queueLength > 0){
+     struct structQueue* queue = getQueue(isForObstacleQueue);
+     queueItem = queue[0];
+     if(shift){
+       int i;
+       for(i=0;i<*queueLength;i++)
+         queue[i] = queue[i+1];
+       (*queueLength)--;
+     }
+  }
+  else if(queueLength == 0){
+    *queueLength = -1;
+  }
+  return queueItem;
+}
 
 void execNextQueue(){
-  int movement_type;
-if(WheelMovingQueueLength > 0){
-  int i;
-  //lcd_clear();
-
-  delay_ms(5000);
-  WheelMoving.encoder_changes = WheelMovingQueue[0].encoder_changes;
-  WheelMoving.backwards       = WheelMovingQueue[0].backwards;
-  WheelMoving.clockwise       = WheelMovingQueue[0].clockwise;
-  movement_type   =             WheelMovingQueue[0].movement_type;
-  WheelMoving.force           = WheelMovingQueue[0].force;
-
-  for(i = 0; i < WheelMovingQueueLength; i++){
-    WheelMovingQueue[i].encoder_changes = WheelMovingQueue[i + 1].encoder_changes;
-    WheelMovingQueue[i].movement_type = WheelMovingQueue[i + 1].movement_type;
-    WheelMovingQueue[i].clockwise = WheelMovingQueue[i + 1].clockwise;
-    WheelMovingQueue[i].backwards = WheelMovingQueue[i + 1].backwards;
-    WheelMovingQueue[i].force = WheelMovingQueue[i + 1].force;
-}
-
-  wheelEncoder.left = 0;
-  wheelEncoder.right = 0;
-  Wheel_Compare.left  = wheel_start_value;
-  Wheel_Compare.right = wheel_start_value;
-  Wheel_Compare.leftcpy  = wheel_start_value;
-  Wheel_Compare.rightcpy = wheel_start_value;
-  WheelMoving.movement_type = movement_type;
-  WheelMovingQueueLength--;
-}
-}
-
-int calculateBrakeDistance(int x){
-  return 26.0 / (1.0 + 862.79 * pow(2.7182818284590452353602874713526625,-0.05 * x));
-}
-
-void addQueue(int encoder_changes,int movement_type,int value,int force){
-  WheelMovingQueue[WheelMovingQueueLength].encoder_changes = encoder_changes;
-  WheelMovingQueue[WheelMovingQueueLength].movement_type = movement_type;
-  WheelMovingQueue[WheelMovingQueueLength].clockwise = value < 0 ? 0 : 1;
-  WheelMovingQueue[WheelMovingQueueLength].backwards = value < 0 ? 1 : 0;
-  WheelMovingQueue[WheelMovingQueueLength].force = force;
-  WheelMovingQueueLength++;
-}
-
-
-
-
-
-
-
-/*
-void calculateEngineSpeed(){
-  WheelSpeed.timer_counter++;
-  if(WheelSpeed.encoderLeft + 10 < wheelEncoder.left || WheelSpeed.encoderRight + 10 < wheelEncoder.right ){
-    WheelSpeed.speed = wheel_circumference / (float) wheel_encoder_amount / (wheel_timer_counter_ms * WheelSpeed.timer_counter) / 10;
-
-    lcd_clear();
-    debugFloat(WheelSpeed.speed);
-    lcd_puts(" ");
-    debug(WheelSpeed.timer_counter);
-    lcd_gotoxy(0,1);
-    debug(WheelSpeed.encoderRight);
-    lcd_puts(":");
-    debug(WheelSpeed.encoderLeft);
-    WheelSpeed.encoderLeft =  wheelEncoder.left;
-    WheelSpeed.encoderRight =  wheelEncoder.right;
-    WheelSpeed.timer_counter = 0;
+  static int wheelEncoderLeft = 0;
+  static int wheelEncoderRight = 0;
+  if(MotorRight.finished == 1 && MotorLeft.finished == 1 && wheelEncoder.leftMove == wheelEncoderLeft && wheelEncoder.rightMove == wheelEncoderRight && queueModifing == 0){
+    struct structQueue queueItem;
+    queueItem = getNextQueueObject(1,HandleCollisionState);
+    if(queueItem.queueIsEmpty != 1){
+      MotorRight.encoder_changes = queueItem.right_encoder_changes;
+      MotorLeft.encoder_changes = queueItem.left_encoder_changes;
+      wheelEncoder.leftMove  = 0;
+      wheelEncoder.rightMove = 0;
+      MotorRight.force = queueItem.right_force;
+      MotorLeft.force = queueItem.left_force;
+      MotorRight.finished = 0;
+      MotorLeft.finished = 0;
+    }
   }
-}
-*/
-
-/**
- * @param mm distance to travel (negative is backwards)
- * @param force if its 1 the queue will be cleared to force this action
- */
-//@todo geschwindigkeit
-int move(float mm,unsigned int force){
-    int encoder_changes = ((mm < 0 ? mm * (-1) : mm)  / (float) ((float) wheel_circumference /  (float) wheel_encoder_amount)) - calculateBrakeDistance(force);
-    addQueue(encoder_changes,wheel_movement_type_move,mm,force);
-    return  encoder_changes;
-}
-/**
- * @param degree
- * @param clockwise [optional] change the rotation direction
- * @param force if its 1 the queue will be cleared to force this action
- */
-//@todo geschwindigkeit
-int rotate(float degree,unsigned int force){
-  int encoder_changes =  robot_circumference / 360.0 / ( (float) wheel_circumference /  (float) wheel_encoder_amount) *  (degree < 0 ? degree * (-1.0): degree) - 4;  // -calculateBrakeDistance(force);
-  addQueue(encoder_changes,wheel_movement_type_rotate,degree,force);
-  return  encoder_changes;
+  wheelEncoderLeft = wheelEncoder.leftMove;
+  wheelEncoderRight = wheelEncoder.rightMove;
 }
 
 
-//@todo bremsen
-interrupt [TIM1_COMPA] void timer1_compa_isr(void)
-{
-  if(WheelMoving.movement_type == wheel_movement_type_move){
-    ENGINE_ENABLE_RIGHT = WheelMoving.encoder_changes > wheelEncoder.right ? 1 : 0;
-     ENGINE_ENABLE_LEFT = WheelMoving.encoder_changes > wheelEncoder.left ? 1 : 0;
-     ENGINE_BACKWARDS_RIGHT = WheelMoving.backwards == 1  ? 1 : 0;
-     ENGINE_BACKWARDS_LEFT  = WheelMoving.backwards == 1  ? 1 : 0;
-     if(ENGINE_ENABLE_LEFT == 0 && ENGINE_ENABLE_RIGHT == 0)
-       WheelMoving.movement_type = wheel_movement_type_stop;
-  }
-  else if(WheelMoving.movement_type == wheel_movement_type_rotate)
-  {
-    ENGINE_ENABLE_RIGHT = WheelMoving.encoder_changes > wheelEncoder.right ? 1 : 0;
-     ENGINE_ENABLE_LEFT = WheelMoving.encoder_changes > wheelEncoder.left ? 1 : 0;
-     ENGINE_BACKWARDS_RIGHT = WheelMoving.clockwise == 1 ? 1 : 0;
-     ENGINE_BACKWARDS_LEFT  = WheelMoving.clockwise == 1 ? 0 : 1;
-     if(ENGINE_ENABLE_LEFT == 0 && ENGINE_ENABLE_RIGHT == 0)
-       WheelMoving.movement_type = wheel_movement_type_stop;
-  }
-  else{
-     execNextQueue();
-  }
-
-  if(checkSensors()){
-    ENGINE_ENABLE_RIGHT = 0;
-    ENGINE_ENABLE_LEFT = 0;
-    handleCollisionObject();
-    Wheel_Compare.hindernis = 1;
+int getRightMotorEnableState(){
+  if(MotorRight.finished == 0){
+     if(MotorRight.encoder_changes > wheelEncoder.rightMove)
+       return 1;
+     else {
+       MotorRight.force = 0;
+       MotorRight.finished  = 1;
+     }
   }
   else
-  Wheel_Compare.hindernis = 0;
-
+   return 1;
 }
 
-
-
-interrupt [TIM1_COMPB] void timer1_compb_isr(void)
-{
-  ENGINE_ENABLE_LEFT = 0;
+int getLeftMotorEnableState(){
+  if(MotorLeft.finished == 0){
+    if(MotorLeft.encoder_changes > wheelEncoder.leftMove)
+      return 1;
+    else {
+      MotorLeft.force = 0;
+      MotorLeft.finished = 1;
+    }
+  }
+  else
+   return 1;
 }
-
-
-interrupt [TIM1_COMPC] void timer1_compc_isr(void)
-{
-ENGINE_ENABLE_RIGHT = 0;
-}
-
 
 interrupt [TIM1_OVF] void timer1_ovf_isr(void)
 {
-  if(Wheel_Compare.left < WheelMoving.force){
-     Wheel_Compare.left++;
-	 Wheel_Compare.leftcpy++;
-  }
-  if(Wheel_Compare.right < WheelMoving.force){
-     Wheel_Compare.right++;
-	 Wheel_Compare.rightcpy++;
-  }
-  if(wheelEncoder.left >= 100||wheelEncoder.right >= 100) {
-  wheelEncoder.leftMove = 0;
-  wheelEncoder.rightMove = 0;
-  }
+  TCNT1H=0xFB00 >> 8;
+  TCNT1L=0xFB00 & 0xff;
 
-  if (5+wheelEncoder.leftMove<wheelEncoder.rightMove){
-   if (Wheel_Compare.left<255)
-     Wheel_Compare.left++;
+   WheelTimerCounter++;
+   if(WheelTimerCounter > 255)
+    WheelTimerCounter = 0;
 
-   else if (Wheel_Compare.right>100)
-     Wheel_Compare.right--;
-  }
-  else if (wheelEncoder.leftMove>wheelEncoder.rightMove+5){
-   if (Wheel_Compare.right<255)
-     Wheel_Compare.right++;
+   if(WheelTimerCounter >= 255 - (MotorLeft.force < 0 ? MotorLeft.force * (-1) : MotorLeft.force)){
+     ENGINE_ENABLE_LEFT = getLeftMotorEnableState();
+     ENGINE_BACKWARDS_LEFT = MotorLeft.force < 0 ? 1 : 0;
+   }
+   else
+     ENGINE_ENABLE_LEFT = 0;
 
-   else if (Wheel_Compare.left>100)
-     Wheel_Compare.left--;
-  }
+     if(WheelTimerCounter >= 255 - (MotorRight.force < 0 ? MotorRight.force * (-1) : MotorRight.force)){
+       ENGINE_ENABLE_RIGHT = getRightMotorEnableState();
+       ENGINE_BACKWARDS_RIGHT = MotorRight.force < 0 ? 1 : 0;
+     }
+     else
+       ENGINE_ENABLE_RIGHT = 0;
 
-  OCR1BL = Wheel_Compare.left;
-  OCR1CL = Wheel_Compare.right;
+    execNextQueue();
+
 }
 
-
 void wheels_init(){
-  TCCR1A  = (0 << COM1A1) |(0 << COM1A0) |(0 << COM1B1) |(0 << COM1B0) |(0 << COM1C1) |(0 << COM1C0) |(0 << WGM11) |(1 << WGM10);
-  TCCR1B  = (0 << ICNC1) |(0 << ICES1) |(0 << WGM13) |(0 << WGM12) |(1 << CS12) |(0 << CS11) |(0 << CS10);
-  TCNT1H  = 0x00;
-  TCNT1L  = 0x00;
+  TCCR1A  = (0 << COM1A1) |(0 << COM1A0) |(0 << COM1B1) |(0 << COM1B0) |(0 << COM1C1) |(0 << COM1C0) |(0 << WGM11) |(0 << WGM10);
+  TCCR1B  = (0 << ICNC1) |(0 << ICES1) |(0 << WGM13) |(0 << WGM12) |(0 << CS12) |(0 << CS11) |(1 << CS10);
+  TCNT1H  = 0xFB00 >> 8;
+  TCNT1L  = 0xFB00 & 0xff;
   ICR1H   = 0x00;
   ICR1L   = 0x00;
   OCR1AH  = 0x00;
@@ -261,12 +191,13 @@ void wheels_init(){
   OCR1BL  = 0x00;
   OCR1CH  = 0x00;
   OCR1CL  = 0x00;
-  TIMSK  |= (1 << TICIE1) |(1 << OCIE1A) |(1 << OCIE1B) |(1 << TOIE1);
-  ETIMSK |= (1 << OCIE1C);
+  TIMSK  |= (0 << TICIE1) |(0 << OCIE1A) |(0 << OCIE1B) |(1 << TOIE1);
+  ETIMSK |= (0 << OCIE1C);
 
-  WheelMoving.movement_type = wheel_movement_type_stop;
-  Wheel_Compare.left  = wheel_start_value;
-  Wheel_Compare.right = wheel_start_value;
-  Wheel_Compare.leftcpy  = wheel_start_value;
-  Wheel_Compare.rightcpy = wheel_start_value;
+  MotorRight.force = 0;
+  MotorLeft.force = 0;
+  MotorRight.encoder_changes = -1;
+  MotorLeft.encoder_changes = -1;
+  MotorRight.finished = 1;
+  MotorLeft.finished = 1;
 }
