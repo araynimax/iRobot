@@ -11,7 +11,7 @@
 int mainstatemachinestate = MainStateMachineState_stop;
 int copymainstatemachinestate = MainStateMachineState_stop;
 
-void fnMainStateMachineState_stop(){
+void resetRobot(){
   MainQueueLength = -1;
   ObstacleQueueLength = -1;
   MotorRight.force = 0;
@@ -24,9 +24,13 @@ void HandleRC5(){
   int rc5temp = rc5_receive();
   mainstatemachinestate = rc5temp != -1 ? rc5temp: mainstatemachinestate;
   if(mainstatemachinestate != copymainstatemachinestate){
-    fnMainStateMachineState_stop();
+    resetRobot();
   }
   copymainstatemachinestate = mainstatemachinestate;
+}
+
+void fnMainStateMachineState_stop(){
+
 }
 
 void fnMainStateMachineState_moveL(){
