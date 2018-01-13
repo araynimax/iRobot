@@ -4,3 +4,13 @@ MEGA128/Release/
 *.c~
 *.hci
 *.h~
+
+ESP8266/website/node_modules/
+
+ESP8266/website/dist/
+
+ESP8266/website/ignore/
+
+ESP8266/website/package-lock\.json
+
+ESP8266/data/
