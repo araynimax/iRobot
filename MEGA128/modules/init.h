@@ -7,8 +7,10 @@
 #include "ultrasonic.h"
 #include "rc5.h"
 #include "wheels.h"
+int get_StateMachineState();
+void set_StateMachineState(int);
 #include "esp_datatransfer.h"
-#include "statemachine/statemachine.h"
+#include "statemachine.h"
 
 void initialize(){
    i2c_init();
@@ -18,7 +20,14 @@ void initialize(){
    wheelencoder_init();
    wheels_init();
    ultrasonic_init();
-   rc5_init();
    esp_datatransfer_init();
+   rc5_init();
    #asm("sei")
+}
+
+int get_StateMachineState(){
+  return mainstatemachinestate;
+}
+void set_StateMachineState(int state){
+  setMainStateMachineState(state);
 }

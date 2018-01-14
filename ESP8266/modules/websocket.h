@@ -2,6 +2,12 @@ WebSocketsServer webSocket = WebSocketsServer(81);
 
 bool con = false; //@todo umnennen ist ein sehr allgemeiner name
 
+
+void processingJSON(JsonObject& root){
+  setState = root["setState"] ? root["setState"] : -1;
+  Serial.printf("Set State: %d\n", setState);
+}
+
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t lenght) {
   switch (type) {
     case WStype_DISCONNECTED:
@@ -18,13 +24,15 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t lenght)
       break;
     case WStype_TEXT:
       {
+        DynamicJsonBuffer jsonBuf;
         String text = String((char *) &payload[0]);
-        Serial.println(text);
-
-        tx_buffer.data.sensor.ultrasonic_angle = text.toInt();
-
-        //webSocket.sendTXT(num, payload, lenght);
-        //webSocket.broadcastTXT(payload, lenght);
+        JsonObject& root = jsonBuf  .parseObject(text);
+        if (root.success()) {
+          processingJSON(root);
+        }
+        else{
+          Serial.println("Failed to parse JSON!");
+        }
       }
       break;
   }
@@ -35,6 +43,8 @@ void sendDataObject()
   DynamicJsonBuffer jsonBuf;
   JsonObject& root = jsonBuf.createObject();
 
+  root["currentState"] = rx_buffer.data.currentState;
+  //Wheelencoder
   root["wheelencoder_left"] = rx_buffer.data.sensor.wheelencoder_left ;
   root["wheelencoder_right"] = rx_buffer.data.sensor.wheelencoder_right ;
   //Ultrasonic
@@ -59,7 +69,6 @@ void sendDataObject()
   root["bumper_left"] = rx_buffer.data.sensor.bumper_left;
   root["bumper_right"] = rx_buffer.data.sensor.bumper_right;
 
-  root["hindernis"] = rx_buffer.data.sensor.hindernis;
 
 
   //wii cam

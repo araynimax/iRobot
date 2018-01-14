@@ -20,7 +20,6 @@
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
   TCNT0 = 254;					// 2 * 256 = 512 cycle
-
   if( ++rc5_time > PULSE_MAX )                  // count pulse time
   {
     if( !(rc5_tmp & 0x4000) && (rc5_tmp & 0x2000) )	// only if 14 bits received

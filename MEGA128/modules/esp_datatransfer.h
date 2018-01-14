@@ -34,14 +34,26 @@ struct TSensor {
   uint8_t  bumper_left;
   uint8_t  bumper_right;
 
-  uint8_t hindernis;
   //wii cam
-  //unsigned int wii_cam_coord_X[4];
-  //unsigned int wii_cam_coord_Y[4];
-  //unsigned int wii_cam_size[4];
+  // uint8_t wii_cam_coord_X[4];
+  // uint8_t wii_cam_coord_Y[4];
+  // uint8_t wii_cam_size[4];
 };
+
+struct TControl{
+  uint8_t isForward;
+  uint8_t isRotate;
+  uint8_t degree;
+  uint8_t force;
+  uint8_t stop;
+};
+
 struct TData {
   struct TSensor sensor;
+  struct TControl manualControl;
+  uint8_t currentState;
+  int16_t setState;
+  //uint8_t  ultrasonic_mapping[180];
 };
 
 const int TWI_BUFFER_SIZE = sizeof(struct TData);
@@ -109,14 +121,21 @@ unsigned char slave_tx_handler(bool tx_complete) {
   //rc5value
   tx_buffer.data.sensor.rc5_value = rc5_data;
     //bumper
-    tx_buffer.data.sensor.bumper_left = BUMPER_LEFT;
+  tx_buffer.data.sensor.bumper_left = BUMPER_LEFT;
   tx_buffer.data.sensor.bumper_right = BUMPER_RIGHT;
 
-   tx_buffer.data.sensor.hindernis = 0;//Wheel_Compare.hindernis;
+  tx_buffer.data.currentState = get_StateMachineState();
+  //Wheel_Compare.hindernis;
   //wii cam
-  // tx_buffer.data.sensor.wii_cam_coord_X = WiiCamData.coord_X;
-  // tx_buffer.data.sensor.wii_cam_coord_Y = WiiCamData.coord_Y;
-  // tx_buffer.data.sensor.wii_cam_size = WiiCamData.size;
+   // {
+   //   int i;
+   //   for(i=0;i<4;i++){
+   //     tx_buffer.data.sensor.wii_cam_coord_X[i] = WiiCamData.coord_X[i];
+   //     tx_buffer.data.sensor.wii_cam_coord_Y[i] = WiiCamData.coord_Y[i];
+   //     tx_buffer.data.sensor.wii_cam_size[i] = WiiCamData.size[i];
+   //   }
+   // }
+
     // number of bytes to transmit from the TWI slave to the TWI master
     return TWI_BUFFER_SIZE;
   }
@@ -124,7 +143,11 @@ unsigned char slave_tx_handler(bool tx_complete) {
   // transmission from slave to master has already started,
   // no more bytes to send in this transaction
   if (esp_datatransfer_received_ok) {
-    ultrasonic_servo.angle = rx_buffer.data.sensor.ultrasonic_angle;
+    if(tx_buffer.data.setState > 0){
+     set_StateMachineState(tx_buffer.data.setState);
+     lcd_clear();
+     PRINT(tx_buffer.data.setState);
+    }
   }
   return 0;
 }

@@ -18,15 +18,20 @@ void resetRobot(){
   MotorRight.encoder_changes = -1;
   MotorLeft.force = 0;
   MotorLeft.encoder_changes = -1;
+  ultrasonic_servo.angle = 0;
 }
 
-void HandleRC5(){
-  int rc5temp = rc5_receive();
-  mainstatemachinestate = rc5temp != -1 ? rc5temp: mainstatemachinestate;
+void setMainStateMachineState(int state){
+  mainstatemachinestate = state != -1 ? state: mainstatemachinestate;
   if(mainstatemachinestate != copymainstatemachinestate){
     resetRobot();
   }
   copymainstatemachinestate = mainstatemachinestate;
+}
+
+void HandleRC5(){
+  int rc5temp = rc5_receive();
+  setMainStateMachineState(rc5temp);
 }
 
 void fnMainStateMachineState_stop(){
@@ -100,9 +105,32 @@ void fnMainStateMachineState_lineFollow(){
 void fnMainStateMachineState_robotFollow(){
 
 }
+ int mapping_counter = -90;
+ unsigned int mapping_plus = 0;
+ int mapping_arrValues;//[180];
+
+ //
+ // if(mapping_plus == 1  && mapping_counter == 90){
+ //   //finished
+ //   setMainStateMachineState(MainStateMachineState_stop);
+ // }else if(mapping_plus == 0 && mapping_counter == -90){
+ //   mapping_counter = 0;
+ //   mapping_plus = 1;
+ // }
+ // if(mapping_plus == 1 && mapping_counter < 90)mapping_counter++;
+ // else if(mapping_counter > 0)mapping_counter--;
 
 void fnMainStateMachineState_mapping(){
+  // tx_buffer.data.ultrasonic_mapping[mapping_counter+89] = ultrasonic_data.distance;
 
+if(mapping_counter == 90){
+  mapping_counter = -90;
+  setMainStateMachineState(MainStateMachineState_stop);
+  return;
+}
+
+ ultrasonic_servo.angle = mapping_counter++;
+ delay_ms(15);
 }
 
 void fnMainStateMachineState_autonomic(){

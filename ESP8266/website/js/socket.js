@@ -39,14 +39,23 @@ let startWebSocket = () => {
 let sendSocketMessage = arg => {
   if(socket !== undefined && socket.readyState ===  1){
     console.log("Sending a message to the server",arg);
-      socket.send(arg);
+      socket.send(JSON.stringify(arg));
+      return 1;
     }
-  else
+  else{
       console.error("WebSocket connection is not established!");
+      return 0;
+    }
 }
 
 let handleWebsocketMessage = data => {
-  for(key in data){
+
+  if(data.currentState !== undefined){
+    document.querySelectorAll('.states ons-list ons-list-item ons-button').forEach(el => el.classList.add("button--quiet"));
+    document.querySelectorAll('.states ons-list ons-list-item ons-button')[ data.currentState].classList.remove("button--quiet");
+  }
+
+  for(let key in data){
     if($('#robot-info #' + key).length){
        $('#robot-info #' + key).text(data[key]);
     }
@@ -57,5 +66,8 @@ let handleWebsocketMessage = data => {
   }
 };
 
-
 startWebSocket();
+
+export default{
+  sendSocketMessage,
+};

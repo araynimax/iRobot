@@ -13,33 +13,70 @@ unsigned int NextHandleCollisionState = 0;
 unsigned int LastHandleCollisionState = 0;
 unsigned int AvoidObstacleSideMoveCount = 0;
 
+struct structMotorStates{
+  struct structMotor right;
+  struct structMotor left;
+  int encoderLeft;
+  int encoderRight;
+} MotorStates;
 
-void FN_HandleCollisionState_noObstacle(int);
+void HandleCollisionStateMachine();
 void FN_HandleCollisionState_Obstacle();
 void FN_HandleCollisionState_calculating();
 void FN_HandleCollisionState_movingRight();
 void FN_HandleCollisionState_movingLeft();
 void FN_HandleCollisionState_movingForward();
 
-int checkForCollision();
-
 void setHandleCollisionState(int);
 
-void handleCollisionObject(int length){
+void getMotorStates(){
+  MotorStates.right = *getMotorStatesRight();
+  MotorStates.left =  *getMotorStatesLeft();
+  MotorStates.encoderLeft = wheelEncoder.leftMove;
+  MotorStates.encoderRight = wheelEncoder.rightMove;
+}
+
+void restoreMotorStates(){
+  *getMotorStatesRight() = MotorStates.right;
+  *getMotorStatesRight() = MotorStates.left;
+   wheelEncoder.leftMove = MotorStates.encoderLeft;
+   wheelEncoder.rightMove = MotorStates.encoderRight;
+}
+
+int checkSensors(){
+  if(HandleCollisionState != HandleCollisionState_noObstacle)
+    return 2;
+  else if(!BUMPER_LEFT || !BUMPER_RIGHT || !DISTANCE_SENSOR_FRONT_LEFT || !DISTANCE_SENSOR_FRONT_RIGHT)
+    return 1;
+  else
+    return 0;
+}
+
+int isInMotion(){
+  return MotorStates.right.finished == 0 || MotorStates.left.finished == 0;
+}
+
+void avoidCollisions(){
+  if(checkSensors() == 1){
+     int* queueLength = getQueueLength(0);
+     if(*queueLength > 0 && isInMotion()){
+       getMotorStates();
+       stopRobot();
+       setHandleCollisionState(HandleCollisionState_Obstacle);
+       AvoidObstacleSideMoveCount = 0;
+     }
+  }else if(checkSensors() == 2){
+    HandleCollisionStateMachine();
+  }
+}
+
+void HandleCollisionStateMachine(){
   if(!HandleCollisionStateChangeable){
   switch(HandleCollisionState){
-
-    case HandleCollisionState_noObstacle:
-      FN_HandleCollisionState_noObstacle(length);
-    break;
 
     case HandleCollisionState_Obstacle:
       FN_HandleCollisionState_Obstacle();
     break;
-    //
-    // case HandleCollisionState_calculating:
-    //   FN_HandleCollisionState_calculating();
-    // break;
 
     case HandleCollisionState_movingRight:
       FN_HandleCollisionState_movingRight();
@@ -66,7 +103,7 @@ void setHandleCollisionState(int state){
   LastHandleCollisionState = HandleCollisionState;
   HandleCollisionState = state;
   if(state == HandleCollisionState_noObstacle)
-    execLastQueue();
+    restoreMotorStates();
 }
 
 void setNextHandleCollisionState(int state){
@@ -85,52 +122,37 @@ void nextObstacleState(){
   HandleCollisionStateChangeable = 0;
 }
 
-int checkSensors(){
-  if(HandleCollisionState != HandleCollisionState_noObstacle)
-    return 2;
-  else if(!BUMPER_LEFT || !BUMPER_RIGHT || !DISTANCE_SENSOR_FRONT_LEFT || !DISTANCE_SENSOR_FRONT_RIGHT)
-    return 1;
-  else
-    return 0;
-}
-
-void FN_HandleCollisionState_noObstacle(int length){
-  if(length > -1)
-     HandleCollisionState = HandleCollisionState_Obstacle;
-  AvoidObstacleSideMoveCount = 0;
-}
-
 void FN_HandleCollisionState_Obstacle(){
 if(BUMPER_LEFT && BUMPER_RIGHT){
     if(!DISTANCE_SENSOR_FRONT_LEFT && DISTANCE_SENSOR_FRONT_RIGHT){
-      move(-20,150);
-      rotate(90,150);
+      moveRobot(-20,150);
+      rotateRobot(90,150);
       setNextHandleCollisionState(HandleCollisionState_movingRight);
     }
     else if(DISTANCE_SENSOR_FRONT_LEFT && !DISTANCE_SENSOR_FRONT_RIGHT){
-      move(-20,150);
-      rotate(-90,150);
+      moveRobot(-20,150);
+      rotateRobot(-90,150);
       setNextHandleCollisionState(HandleCollisionState_movingLeft);
     }
     else if(!DISTANCE_SENSOR_FRONT_LEFT && !DISTANCE_SENSOR_FRONT_RIGHT){
-      move(-20,150);
-      rotate(90,150);
+      moveRobot(-20,150);
+      rotateRobot(90,150);
       setNextHandleCollisionState(HandleCollisionState_movingRight);
     }
   }
   else if(!BUMPER_LEFT && BUMPER_RIGHT){
-    move(-40,150);
-    rotate(90,150);
+    moveRobot(-40,150);
+    rotateRobot(90,150);
     setNextHandleCollisionState(HandleCollisionState_movingRight);
   }
   else if(BUMPER_LEFT && !BUMPER_RIGHT){
-    move(-40,150);
-    rotate(-90,150);
+    moveRobot(-40,150);
+    rotateRobot(-90,150);
     setNextHandleCollisionState(HandleCollisionState_movingLeft);
   }
   else if(!BUMPER_LEFT && !BUMPER_RIGHT){
-    move(-40,150);
-    rotate(90,150);
+    moveRobot(-40,150);
+    rotateRobot(90,150);
     setNextHandleCollisionState(HandleCollisionState_movingRight);
   }
 
@@ -143,14 +165,14 @@ if(!DISTANCE_SENSOR_LEFT){
     }
    else{
      AvoidObstacleSideMoveCount++;
-     move(100,150);
+     moveRobot(100,150);
      setNextHandleCollisionState(HandleCollisionState_movingRight);
    }
 }
 else{
-    stopMove();
-    rotate(-90,150);
-    move(200,150);
+    stopRobot();
+    rotateRobot(-90,150);
+    moveRobot(200,150);
     setNextHandleCollisionState(HandleCollisionState_movingForward);
 }
 
@@ -163,53 +185,36 @@ void FN_HandleCollisionState_movingLeft(){
       }
      else{
        AvoidObstacleSideMoveCount++;
-       move(100,150);
+       moveRobot(100,150);
        setNextHandleCollisionState(HandleCollisionState_movingLeft);
      }
   }
   else{
-     stopMove();
-     rotate(90,150);
-     move(200,150);
+     stopRobot();
+     rotateRobot(90,150);
+     moveRobot(200,150);
      setNextHandleCollisionState(HandleCollisionState_movingForward);
   }
 }
 
 void FN_HandleCollisionState_movingForward(){
-  if(LastHandleCollisionState == HandleCollisionState_movingRight){
-    if(!DISTANCE_SENSOR_LEFT){
+    if(LastHandleCollisionState == HandleCollisionState_movingLeft ? !DISTANCE_SENSOR_RIGHT : !DISTANCE_SENSOR_LEFT){
        if(checkFront()){
           clearQueue();
         }
        else{
-         move(100,150);
-       }
-    }
-    else{
-      int i;
-       rotate(-90,150);
-       for(i = 0;i< AvoidObstacleSideMoveCount; i++)
-        move(100,150);
-      rotate(90,150);
-      setNextHandleCollisionState(HandleCollisionState_noObstacle);
-    }
-  }
-  else if(LastHandleCollisionState == HandleCollisionState_movingLeft){
-    if(!DISTANCE_SENSOR_RIGHT){
-       if(checkFront()){
-          clearQueue();
-        }
-       else{
-         move(100,150);
+         moveRobot(100,150);
+         MotorStates.encoderLeft +=calculateEncoderChanges(100,0);
+         MotorStates.encoderRight+=calculateEncoderChanges(100,0);
+         setNextHandleCollisionState(HandleCollisionState_movingForward);
        }
     }
     else{
     int i;
-      rotate(90,150);
+      rotateRobot(LastHandleCollisionState == HandleCollisionState_movingLeft ? 90 : -90,150);
       for(i = 0;i< AvoidObstacleSideMoveCount; i++)
-       move(100,150);
-      rotate(-90,150);
+       moveRobot(100,150);
+      rotateRobot(LastHandleCollisionState == HandleCollisionState_movingLeft ? -90 : 90,150);
      setNextHandleCollisionState(HandleCollisionState_noObstacle);
     }
-  }
 }

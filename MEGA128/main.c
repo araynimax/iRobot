@@ -34,13 +34,9 @@ Data Stack size         : 1024
 void main(void)
 {
   initialize();
+  
   while(1){
     cyclestate();
-    lcd_clear();
-    PRINT(LIGHT_SENSOR_RIGHT);
-    lcd_gotoxy(0,1);
-    PRINT(LIGHT_SENSOR_LEFT);
-    delay_ms(50);
 }
 
 

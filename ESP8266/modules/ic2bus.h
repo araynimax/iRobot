@@ -33,23 +33,37 @@ struct TSensor {
   uint8_t  bumper_left;
   uint8_t  bumper_right;
 
-  uint8_t hindernis;
   //wii cam
-  //unsigned int wii_cam_coord_X[4];
-  //unsigned int wii_cam_coord_Y[4];
-  //unsigned int wii_cam_size[4];
+  // uint8_t wii_cam_coord_X[4];
+  // uint8_t wii_cam_coord_Y[4];
+  // uint8_t wii_cam_size[4];
 };
+
+struct TControl{
+  uint8_t isForward;
+  uint8_t isRotate;
+  uint8_t degree;
+  uint8_t force;
+  uint8_t stop;
+};
+
 struct TData {
   struct TSensor sensor;
+  struct TControl manualControl;
+  uint8_t currentState;
+  int16_t setState;
+  //uint8_t  ultrasonic_mapping[180];
 };
+
 
 const int BUFFER_SIZE = sizeof(struct TData);
 
 union TBuffer {
-  unsigned char bytes[BUFFER_SIZE];
+  char bytes[BUFFER_SIZE];
   struct TData data;
 };
 
+int setState = -1;
 
 #pragma pack(pop)
 
@@ -57,7 +71,7 @@ union TBuffer rx_buffer;
 union TBuffer tx_buffer;
 
 
-unsigned char i2c_master_trans(unsigned char *tx_data,unsigned char tx_count,unsigned char *rx_data,unsigned char rx_count)
+unsigned char i2c_master_trans(char *tx_data,char tx_count,char *rx_data,char rx_count)
 {
   unsigned char i = 0;
   unsigned char i2c_error = 0;
@@ -86,7 +100,8 @@ void i2c_exchange_data(void)
   char charBuf[16];
 
   // prepare the data in the tx_buffer
-   //PREPARE HERE
+   tx_buffer.data.setState = setState;
+   setState = -1;
 
   // transmit data from tx_buffer to the slave and receive response in rx_buffer
   i2c_result = i2c_master_trans(tx_buffer.bytes, BUFFER_SIZE, rx_buffer.bytes, BUFFER_SIZE);
@@ -96,9 +111,8 @@ void i2c_exchange_data(void)
   {
     // I2C transaction was performed without errors
     Serial.printf("I2C transaction result: %i\r\n", i2c_result);
-    Serial.printf("Transmitted to MEGA128");
-    Serial.printf("Received from MEGA128");
-    Serial.printf("Content of Receive Buffer: ");
+    Serial.printf("Received from MEGA128\n\r");
+    Serial.printf("Content of Receive Buffer: \n\r");
     for (int i = 0; i < BUFFER_SIZE; i++)
       Serial.printf("%2X ", rx_buffer.bytes[i]);
     Serial.printf("\r\n");

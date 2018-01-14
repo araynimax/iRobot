@@ -1,36 +1,52 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
-<title>ESP8266 Web Server</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+  <title>ESP8266 Web Server</title>
 </head>
 
 <body>
-<ons-page>
+  <ons-page>
 
-  <ons-toolbar>
-    <div class="center">iRobot</div>
-  </ons-toolbar>
-  <div class="loadingScreen">
+    <ons-toolbar>
+      <div class="center">iRobot</div>
+    </ons-toolbar>
+    <!-- <div class="loadingScreen">
   <div class="awesome-spinner"></div>
   <div class="text">Connecting to WebSocket...</div>
-  </div>
-  <ons-tabbar swipeable position="auto">
-    <ons-tab page="homeTab" label="Home" icon="ion-home, material:md-home" active></ons-tab>
-    <ons-tab page="controllTab" label="Control" icon="fa-gamepad"></ons-tab>
+  </div> -->
+    <ons-tabbar swipeable position="auto">
+      <ons-tab page="homeTab" label="Home" icon="ion-home, material:md-home" active></ons-tab>
+      <ons-tab page="controllTab" label="Control" icon="fa-gamepad"></ons-tab>
       <ons-tab page="infoTab" label="Info" icon="fa-info"></ons-tab>
-  </ons-tabbar>
+    </ons-tabbar>
 
-</ons-page>
+  </ons-page>
 
-<template id="homeTab">
+  <template id="homeTab">
   <ons-page id="homeTab" style="text-align: center">
-     <ons-range class="ultrasonic_servo" style="width: 50%;" min="-90" max="90" step="1"></ons-range>
+    <ons-card>
+          <div class="title">
+            Programme
+          </div>
+          <div class="states content">
+            <ons-list>
+              <ons-list-item><ons-button modifier="quiet">Stop</ons-button></ons-list-item>
+              <ons-list-item><ons-button modifier="quiet">L - Fahren</ons-button></ons-list-item>
+              <ons-list-item><ons-button modifier="quiet">Wanzenverhalten</ons-button></ons-list-item>
+              <ons-list-item><ons-button modifier="quiet">Mottenverhalten</ons-button></ons-list-item>
+              <ons-list-item><ons-button modifier="quiet">Linienverfolgung</ons-button></ons-list-item>
+              <ons-list-item><ons-button modifier="quiet">Roboterverfolgung</ons-button></ons-list-item>
+              <ons-list-item><ons-button modifier="quiet">Kartierung</ons-button></ons-list-item>
+              <ons-list-item><ons-button modifier="quiet">Autonomes Fahren</ons-button></ons-list-item>
+            </ons-list>
+    </ons-card>
   </ons-page>
 </template>
 
-<template id="controllTab">
+  <template id="controllTab">
   <ons-page id="controllTab">
     <p style="text-align: center;">
 
@@ -38,7 +54,7 @@
   </ons-page>
 </template>
 
-<template id="infoTab">
+  <template id="infoTab">
   <ons-page id="infoTab">
      <ons-list id="robot-info">
 
@@ -46,6 +62,7 @@
   </ons-page>
 </template>
 
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
+
 </html>

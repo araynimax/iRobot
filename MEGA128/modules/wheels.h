@@ -17,12 +17,14 @@
 #define wheel_encoder_amount (wheel_encoder_amount_white + wheel_encoder_amount_black)
 
 
-//
-#define HandleCollisionState 0
-//
 
 
-int WheelTimerCounter = 0;
+void moveRobot(int mm,int force);
+void rotateRobot(float degree, int force);
+void clearQueue();
+void stopRobot();
+int* getQueueLength(int ForObstacleQueue);
+int calculateEncoderChanges(int value,int isRotation);
 
 struct structMotor{
   int force;
@@ -38,6 +40,14 @@ struct structQueue{
   int left_encoder_changes;
 };
 
+struct structMotor* getMotorStatesLeft();
+struct structMotor* getMotorStatesRight();
+
+#include "obstaclehandler.h"
+
+
+int WheelTimerCounter = 0;
+
 struct structMotor MotorRight;
 struct structMotor MotorLeft;
 
@@ -50,6 +60,13 @@ int ObstacleQueueLength = -1;
 
 int queueModifing = 0;
 
+struct structMotor* getMotorStatesLeft(){
+  return &MotorLeft;
+}
+
+struct structMotor* getMotorStatesRight(){
+  return &MotorRight;
+}
 
 int* getQueueLength(int ForObstacleQueue){
   return ForObstacleQueue ? &ObstacleQueueLength : &MainQueueLength;
@@ -59,9 +76,13 @@ struct structQueue* getQueue(int ForObstacleQueue){
   return ForObstacleQueue ? ObstacleQueue : MainQueue;
 }
 
+int calculateEncoderChanges(int value,int isRotation){
+  return isRotation ? (robot_circumference / 360.0 / ( (float) wheel_circumference /  (float) wheel_encoder_amount) *  (value < 0 ? value * (-1.0): value) - 4) : ((value < 0 ? value * (-1) : value)  / (float) ((float) wheel_circumference /  (float) wheel_encoder_amount));
+}
+
 void addToQueue(int force,int value,int isRotation,int isForObstacleQueue){
   if(*getQueueLength(isForObstacleQueue) < MAX_QUEUE_LENGTH){
-    int encoderChange = isRotation ? (robot_circumference / 360.0 / ( (float) wheel_circumference /  (float) wheel_encoder_amount) *  (value < 0 ? value * (-1.0): value) - 4) : ((value < 0 ? value * (-1) : value)  / (float) ((float) wheel_circumference /  (float) wheel_encoder_amount));
+    int encoderChange = calculateEncoderChanges(value,isRotation);
     int* queueLength = getQueueLength(isForObstacleQueue);
     struct structQueue* queue = getQueue(isForObstacleQueue);
     queueModifing = 1;
@@ -75,12 +96,22 @@ void addToQueue(int force,int value,int isRotation,int isForObstacleQueue){
   queueModifing = 0;
 }
 
-void setMotorDistance(int mm,int force){
-  addToQueue(force,mm,0,HandleCollisionState);
+void clearQueue(){
+  int* queueLength = getQueueLength(checkSensors() != 0);
+  *queueLength = 0;
+}
+
+void moveRobot(int mm,int force){
+  addToQueue(force,mm,0,checkSensors() != 0);
 }
 
 void rotateRobot(float degree, int force){
-  addToQueue(force,degree,1,HandleCollisionState);
+  addToQueue(force,degree,1,checkSensors() != 0);
+}
+
+void stopRobot(){
+  MotorRight.encoder_changes = 0;
+  MotorLeft.encoder_changes = 0;
 }
 
 struct structQueue getNextQueueObject(int shift,int isForObstacleQueue){
@@ -104,11 +135,9 @@ struct structQueue getNextQueueObject(int shift,int isForObstacleQueue){
 }
 
 void execNextQueue(){
-  static int wheelEncoderLeft = 0;
-  static int wheelEncoderRight = 0;
-  if(MotorRight.finished == 1 && MotorLeft.finished == 1 && wheelEncoder.leftMove == wheelEncoderLeft && wheelEncoder.rightMove == wheelEncoderRight && queueModifing == 0){
+  if(MotorRight.finished == 1 && MotorLeft.finished == 1 && queueModifing == 0){
     struct structQueue queueItem;
-    queueItem = getNextQueueObject(1,HandleCollisionState);
+    queueItem = getNextQueueObject(1,checkSensors() != 0);
     if(queueItem.queueIsEmpty != 1){
       MotorRight.encoder_changes = queueItem.right_encoder_changes;
       MotorLeft.encoder_changes = queueItem.left_encoder_changes;
@@ -119,9 +148,9 @@ void execNextQueue(){
       MotorRight.finished = 0;
       MotorLeft.finished = 0;
     }
+    else if(queueItem.queueIsEmpty == 1 && checkSensors() == 2)
+             nextObstacleState();
   }
-  wheelEncoderLeft = wheelEncoder.leftMove;
-  wheelEncoderRight = wheelEncoder.rightMove;
 }
 
 
@@ -175,6 +204,7 @@ interrupt [TIM1_OVF] void timer1_ovf_isr(void)
        ENGINE_ENABLE_RIGHT = 0;
 
     execNextQueue();
+    avoidCollisions();
 
 }
 
