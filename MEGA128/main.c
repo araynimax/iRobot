@@ -25,18 +25,19 @@ Data Stack size         : 1024
 #include <delay.h>
 #include <stdlib.h>
 
-//#define max(a,b) a>b ? a : b
-
 #include "modules/init.h"
 #include "modules/demo.h"
 
 
 void main(void)
 {
-  initialize();
-  
-  while(1){
+  initialize(); 
+  while(1){     
+  char str[10];  
+    lcd_clear();
     cyclestate();
+    PRINT(mainstatemachinestate);
+    delay_ms(50);            
 }
 
 
