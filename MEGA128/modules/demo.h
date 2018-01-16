@@ -11,7 +11,7 @@
 #define demostate_rc5  6
 #define demostate_stop 7
 
-int state = demostate_distance_sensor;
+int state = demostate_linedetector;
 int state_info = 0;
 
 int engine_dir = 0;

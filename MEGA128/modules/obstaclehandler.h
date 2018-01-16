@@ -38,7 +38,7 @@ void getMotorStates(){
 
 void restoreMotorStates(){
   *getMotorStatesRight() = MotorStates.right;
-  *getMotorStatesRight() = MotorStates.left;
+  *getMotorStatesLeft() = MotorStates.left;
    wheelEncoder.leftMove = MotorStates.encoderLeft;
    wheelEncoder.rightMove = MotorStates.encoderRight;
 }
@@ -53,13 +53,13 @@ int checkSensors(){
 }
 
 int isInMotion(){
-  return MotorStates.right.finished == 0 || MotorStates.left.finished == 0;
+  return MotorStates.right.finished == 0 && MotorStates.left.finished == 0;
 }
 
 void avoidCollisions(){
   if(checkSensors() == 1){
      int* queueLength = getQueueLength(0);
-     if(*queueLength > 0 && isInMotion()){
+     if(*queueLength > 0 || isInMotion()){
        getMotorStates();
        stopRobot();
        setHandleCollisionState(HandleCollisionState_Obstacle);
@@ -125,33 +125,33 @@ void nextObstacleState(){
 void FN_HandleCollisionState_Obstacle(){
 if(BUMPER_LEFT && BUMPER_RIGHT){
     if(!DISTANCE_SENSOR_FRONT_LEFT && DISTANCE_SENSOR_FRONT_RIGHT){
-      moveRobot(-20,150);
+      moveRobot(-40,150);
       rotateRobot(90,150);
       setNextHandleCollisionState(HandleCollisionState_movingRight);
     }
     else if(DISTANCE_SENSOR_FRONT_LEFT && !DISTANCE_SENSOR_FRONT_RIGHT){
-      moveRobot(-20,150);
+      moveRobot(-40,150);
       rotateRobot(-90,150);
       setNextHandleCollisionState(HandleCollisionState_movingLeft);
     }
     else if(!DISTANCE_SENSOR_FRONT_LEFT && !DISTANCE_SENSOR_FRONT_RIGHT){
-      moveRobot(-20,150);
+      moveRobot(-40,150);
       rotateRobot(90,150);
       setNextHandleCollisionState(HandleCollisionState_movingRight);
     }
   }
   else if(!BUMPER_LEFT && BUMPER_RIGHT){
-    moveRobot(-40,150);
+    moveRobot(-80,150);
     rotateRobot(90,150);
     setNextHandleCollisionState(HandleCollisionState_movingRight);
   }
   else if(BUMPER_LEFT && !BUMPER_RIGHT){
-    moveRobot(-40,150);
+    moveRobot(-80,150);
     rotateRobot(-90,150);
     setNextHandleCollisionState(HandleCollisionState_movingLeft);
   }
   else if(!BUMPER_LEFT && !BUMPER_RIGHT){
-    moveRobot(-40,150);
+    moveRobot(-80,150);
     rotateRobot(90,150);
     setNextHandleCollisionState(HandleCollisionState_movingRight);
   }

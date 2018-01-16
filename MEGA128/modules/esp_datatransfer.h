@@ -143,10 +143,8 @@ unsigned char slave_tx_handler(bool tx_complete) {
   // transmission from slave to master has already started,
   // no more bytes to send in this transaction
   if (esp_datatransfer_received_ok) {
-    if(tx_buffer.data.setState > 0){
-     set_StateMachineState(tx_buffer.data.setState);
-     lcd_clear();
-     PRINT(tx_buffer.data.setState);
+    if(rx_buffer.data.setState == 1){
+     set_StateMachineState(rx_buffer.data.currentState);
     }
   }
   return 0;

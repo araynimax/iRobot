@@ -116,7 +116,7 @@ void stopRobot(){
 
 struct structQueue getNextQueueObject(int shift,int isForObstacleQueue){
   int* queueLength = getQueueLength(isForObstacleQueue);
-  struct structQueue queueItem;
+  struct structQueue queueItem;                                             
   queueItem.queueIsEmpty = 1;
   if(*queueLength > 0){
      struct structQueue* queue = getQueue(isForObstacleQueue);
@@ -128,7 +128,7 @@ struct structQueue getNextQueueObject(int shift,int isForObstacleQueue){
        (*queueLength)--;
      }
   }
-  else if(queueLength == 0){
+  else if(*queueLength == 0){
     *queueLength = -1;
   }
   return queueItem;
@@ -137,8 +137,8 @@ struct structQueue getNextQueueObject(int shift,int isForObstacleQueue){
 void execNextQueue(){
   if(MotorRight.finished == 1 && MotorLeft.finished == 1 && queueModifing == 0){
     struct structQueue queueItem;
-    queueItem = getNextQueueObject(1,checkSensors() != 0);
-    if(queueItem.queueIsEmpty != 1){
+    queueItem = getNextQueueObject(1, HandleCollisionState != HandleCollisionState_noObstacle);                                              
+    if(queueItem.queueIsEmpty != 1){    
       MotorRight.encoder_changes = queueItem.right_encoder_changes;
       MotorLeft.encoder_changes = queueItem.left_encoder_changes;
       wheelEncoder.leftMove  = 0;
@@ -147,9 +147,11 @@ void execNextQueue(){
       MotorLeft.force = queueItem.left_force;
       MotorRight.finished = 0;
       MotorLeft.finished = 0;
+    }      
+    
+    else if(queueItem.queueIsEmpty == 1 && HandleCollisionState != HandleCollisionState_noObstacle){
+    nextObstacleState();
     }
-    else if(queueItem.queueIsEmpty == 1 && checkSensors() == 2)
-             nextObstacleState();
   }
 }
 
@@ -160,7 +162,7 @@ int getRightMotorEnableState(){
        return 1;
      else {
        MotorRight.force = 0;
-       MotorRight.finished  = 1;
+       MotorRight.finished  = 1;  
      }
   }
   else
@@ -203,8 +205,10 @@ interrupt [TIM1_OVF] void timer1_ovf_isr(void)
      else
        ENGINE_ENABLE_RIGHT = 0;
 
-    execNextQueue();
-    avoidCollisions();
+      if(WheelTimerCounter == 0){
+      execNextQueue();
+      avoidCollisions();
+      }
 
 }
 
@@ -227,7 +231,9 @@ void wheels_init(){
   MotorRight.force = 0;
   MotorLeft.force = 0;
   MotorRight.encoder_changes = -1;
-  MotorLeft.encoder_changes = -1;
+  MotorLeft.encoder_changes = -1;  
+  wheelEncoder.rightMove = 1;
+  wheelEncoder.leftMove = 1;
   MotorRight.finished = 1;
   MotorLeft.finished = 1;
 }

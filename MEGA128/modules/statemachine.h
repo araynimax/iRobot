@@ -10,6 +10,7 @@
 
 int mainstatemachinestate = MainStateMachineState_stop;
 int copymainstatemachinestate = MainStateMachineState_stop;
+int initRound = 1;
 
 void resetRobot(){
   MainQueueLength = -1;
@@ -18,7 +19,8 @@ void resetRobot(){
   MotorRight.encoder_changes = -1;
   MotorLeft.force = 0;
   MotorLeft.encoder_changes = -1;
-  ultrasonic_servo.angle = 0;
+  ultrasonic_servo.angle = 0; 
+  initRound = 1;
 }
 
 void setMainStateMachineState(int state){
@@ -39,7 +41,20 @@ void fnMainStateMachineState_stop(){
 }
 
 void fnMainStateMachineState_moveL(){
-
+    if(initRound==1){
+      moveRobot(1000,100);
+      rotateRobot(90,100);  
+      moveRobot(1000,100);
+      rotateRobot(180,100);
+      moveRobot(1000,100);
+      rotateRobot(-90,100);
+      moveRobot(1000,100);
+      initRound = 0;
+    }           
+    else if(MainQueueLength == -1){
+      setMainStateMachineState(MainStateMachineState_stop);
+    }
+    
 }
 
 void fnMainStateMachineState_bug(){
@@ -81,30 +96,106 @@ else{
   MotorLeft.force = 0;
 }
 }
-
+/*
 void fnMainStateMachineState_lineFollow(){
-  if(LINE_DETECTOR_MID_LEFT || LINE_DETECTOR_LEFT && !LINE_DETECTOR_MID_RIGHT ||!LINE_DETECTOR_RIGHT ){
+if(LINE_DETECTOR_MID_LEFT || LINE_DETECTOR_LEFT || LINE_DETECTOR_MID_RIGHT ||LINE_DETECTOR_RIGHT){
+initRound = 0;
+}
+if(initRound == 0){
+  if(LINE_DETECTOR_BOTH_RIGHT < LINE_DETECTOR_BOTH_LEFT && LINE_DETECTOR_BOTH_RIGHT+LINE_DETECTOR_BOTH_LEFT > 500){
       MotorLeft.force  = -45;
-      MotorRight.force = 55;
+      MotorRight.force = 65;
     }
 
-    else if(!LINE_DETECTOR_MID_LEFT || !LINE_DETECTOR_LEFT && LINE_DETECTOR_MID_RIGHT || LINE_DETECTOR_RIGHT){
-    MotorLeft.force  =  55;
+    else if(LINE_DETECTOR_BOTH_RIGHT > LINE_DETECTOR_BOTH_LEFT && LINE_DETECTOR_BOTH_RIGHT+LINE_DETECTOR_BOTH_LEFT > 500){
+    MotorLeft.force  =  65;
       MotorRight.force = -45;
     }
-    else if(LINE_DETECTOR_MID_LEFT || LINE_DETECTOR_LEFT && LINE_DETECTOR_MID_RIGHT || LINE_DETECTOR_RIGHT){
+    else if(LINE_DETECTOR_BOTH_RIGHT == LINE_DETECTOR_BOTH_LEFT && LINE_DETECTOR_BOTH_RIGHT+LINE_DETECTOR_BOTH_LEFT > 500){
       MotorLeft.force  = 55;
       MotorRight.force  = 55;
     }
     else{
-      MotorLeft.force  = 0;
-      MotorRight.force  = 0;
+      MotorLeft.force   = 55;
+      MotorRight.force  = -55;
+    }
+}
+else{
+      MotorLeft.force  = 60;
+      MotorRight.force = 60;
+}
+}
+*/
+void fnMainStateMachineState_lineFollow(){
+static int lastMove = 0;
+  if(!LINE_DETECTOR_MID_LEFT && !LINE_DETECTOR_LEFT || LINE_DETECTOR_MID_RIGHT || LINE_DETECTOR_RIGHT ){
+      MotorLeft.force  = -50;
+      MotorRight.force = 60;  
+      lastMove = 1;
+    }
+
+    else if(LINE_DETECTOR_MID_LEFT || LINE_DETECTOR_LEFT || !LINE_DETECTOR_MID_RIGHT && !LINE_DETECTOR_RIGHT){
+    MotorLeft.force  =  60;
+      MotorRight.force = -50;  
+      lastMove = 2;
+    }
+    else if(LINE_DETECTOR_MID_LEFT || LINE_DETECTOR_LEFT && LINE_DETECTOR_MID_RIGHT || LINE_DETECTOR_RIGHT){
+      MotorLeft.force  = 60;
+      MotorRight.force  = 60;    
+      lastMove = 3;
+    }
+    else{
+      switch(lastMove){
+      case 1: 
+          MotorLeft.force  =  60;
+      MotorRight.force = -50;  
+      break; 
+      case 2: 
+          MotorLeft.force  = -50;
+      MotorRight.force = 60;  
+      break;
+      default:
+            MotorLeft.force  = -50;
+            MotorRight.force = 60;  
+      }
     }
 }
 
+int followSignal(){
+wii_cam_read();
+if(WiiCamData.coord_X[0] == 1023 && WiiCamData.coord_Y[0] == 1023 && WiiCamData.size[0] == 15)
+return 0;
+else if(!DISTANCE_SENSOR_FRONT_LEFT || !DISTANCE_SENSOR_FRONT_RIGHT || !BUMPER_LEFT || !BUMPER_RIGHT)
+return 0;
+else return 1; 
+}
+
 void fnMainStateMachineState_robotFollow(){
+if(followSignal() == 1){
+	if(WiiCamData.coord_X[0] < 200){
+      MotorLeft.force =   55;
+      MotorRight.force =  0;
+	}
+	else if(WiiCamData.coord_X[0] >= 1023-200){
+	  MotorRight.force =   55;
+      MotorRight.force =   0;
+	}
+    else{
+         MotorRight.force =   55; 
+         MotorLeft.force =   55;
+    }
 
 }
+else{
+ MotorLeft.force =   55;
+ MotorRight.force = -55;
+}
+ 
+}
+
+
+
+
  int mapping_counter = -90;
  unsigned int mapping_plus = 0;
  int mapping_arrValues;//[180];

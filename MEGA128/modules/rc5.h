@@ -19,7 +19,8 @@
 //Timer 0 overflow interrupt service routine
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
-  TCNT0 = 254;					// 2 * 256 = 512 cycle
+  TCNT0 = 254;			
+  		// 2 * 256 = 512 cycle
   if( ++rc5_time > PULSE_MAX )                  // count pulse time
   {
     if( !(rc5_tmp & 0x4000) && (rc5_tmp & 0x2000) )	// only if 14 bits received
@@ -48,17 +49,17 @@ interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 
 int rc5_receive()
 {
-  unsigned int i;
+  unsigned int temp_rc5_data;
 
   #asm("cli")
-  i = rc5_data;			// read two bytes from interrupt !
+  temp_rc5_data = rc5_data;			// read two bytes from interrupt !
   rc5_data = 0;
-  #asm("sei")
-  if( i )
+  #asm("sei")       
+  if( temp_rc5_data )
   {
-    rc5_ucToggle = i >> 11 & 1;
-    rc5_ucAdress = i >> 6 & 0x1F;
-    rc5_ucData = (i & 0x3F) | (~i >> 7 & 0x40);
+    rc5_ucToggle = temp_rc5_data >> 11 & 1;
+    rc5_ucAdress = temp_rc5_data >> 6 & 0x1F;
+    rc5_ucData = (temp_rc5_data & 0x3F) | (~temp_rc5_data >> 7 & 0x40);
     return rc5_ucData;
   }
   else
