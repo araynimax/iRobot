@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+
 #include <lcd.h>
 
 /**
@@ -100,8 +104,6 @@ PORTC = 0x00;
 PORTD = 0x00;
 PORTE = 0x00;
 PORTF = 0x00;
-
-
 
 // LCD initialization
 lcd_init(16);

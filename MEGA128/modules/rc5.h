@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+
 #define RC5TIME 	1.778e-3		// 1.778msec
 #define	XTAL		16.0E6
 #define PULSE_MIN	(unsigned char)(XTAL / 512 * RC5TIME * 0.2 + 0.5)
@@ -19,7 +23,7 @@
 //Timer 0 overflow interrupt service routine
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
-  TCNT0 = 254;			
+  TCNT0 = 254;
   		// 2 * 256 = 512 cycle
   if( ++rc5_time > PULSE_MAX )                  // count pulse time
   {
@@ -54,7 +58,7 @@ int rc5_receive()
   #asm("cli")
   temp_rc5_data = rc5_data;			// read two bytes from interrupt !
   rc5_data = 0;
-  #asm("sei")       
+  #asm("sei")
   if( temp_rc5_data )
   {
     rc5_ucToggle = temp_rc5_data >> 11 & 1;

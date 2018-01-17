@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+
 #define HandleCollisionState_noObstacle 0
 #define HandleCollisionState_Obstacle 1
 #define HandleCollisionState_calculating 2
@@ -125,34 +129,34 @@ void nextObstacleState(){
 void FN_HandleCollisionState_Obstacle(){
 if(BUMPER_LEFT && BUMPER_RIGHT){
     if(!DISTANCE_SENSOR_FRONT_LEFT && DISTANCE_SENSOR_FRONT_RIGHT){
-      moveRobot(-40,150);
-      rotateRobot(90,150);
+      moveRobot(-40,60);
+      rotateRobot(90,60);
       setNextHandleCollisionState(HandleCollisionState_movingRight);
     }
     else if(DISTANCE_SENSOR_FRONT_LEFT && !DISTANCE_SENSOR_FRONT_RIGHT){
-      moveRobot(-40,150);
-      rotateRobot(-90,150);
+      moveRobot(-40,60);
+      rotateRobot(-90,60);
       setNextHandleCollisionState(HandleCollisionState_movingLeft);
     }
     else if(!DISTANCE_SENSOR_FRONT_LEFT && !DISTANCE_SENSOR_FRONT_RIGHT){
-      moveRobot(-40,150);
-      rotateRobot(90,150);
+      moveRobot(-40,60);
+      rotateRobot(90,60);
       setNextHandleCollisionState(HandleCollisionState_movingRight);
     }
   }
   else if(!BUMPER_LEFT && BUMPER_RIGHT){
-    moveRobot(-80,150);
-    rotateRobot(90,150);
+    moveRobot(-80,60);
+    rotateRobot(90,60);
     setNextHandleCollisionState(HandleCollisionState_movingRight);
   }
   else if(BUMPER_LEFT && !BUMPER_RIGHT){
-    moveRobot(-80,150);
-    rotateRobot(-90,150);
+    moveRobot(-80,60);
+    rotateRobot(-90,60);
     setNextHandleCollisionState(HandleCollisionState_movingLeft);
   }
   else if(!BUMPER_LEFT && !BUMPER_RIGHT){
-    moveRobot(-80,150);
-    rotateRobot(90,150);
+    moveRobot(-80,60);
+    rotateRobot(90,60);
     setNextHandleCollisionState(HandleCollisionState_movingRight);
   }
 

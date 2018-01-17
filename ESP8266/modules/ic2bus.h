@@ -1,11 +1,12 @@
+/**
+ * Created by ArayniMax
+ */
+
 #define TWI_SLAVE_ADDR 0x50
-//#define TBUFFER_SIZE 64
 
 #pragma pack(push, 1)
 
 unsigned char i2c_result = 0;
-
-
 
 struct TSensor {
   //Wheelencoder value

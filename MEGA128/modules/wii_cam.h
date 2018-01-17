@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+
 #define WIICAM_SLAVEADRESS 0xB0
 #define WIICAM_SLAVEREAD   0xB1
 

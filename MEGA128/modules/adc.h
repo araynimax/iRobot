@@ -1,3 +1,8 @@
+/**
+ * Author unknown Ive copied that from the schoolnetwork
+ * -ArayniMax
+ */
+
 #define FIRST_ADC_INPUT 0
 #define LAST_ADC_INPUT 6
 unsigned int adc_data[LAST_ADC_INPUT-FIRST_ADC_INPUT+1];

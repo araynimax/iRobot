@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+
 #include <ESP8266WiFi.h>
 #include <WebSocketsServer.h>
 #include <ArduinoJson.h>
@@ -9,19 +13,12 @@
 #include "modules/webserver.h"
 
 
-
-//@todo ins richtige file packen
-unsigned char i = 0;
-int16_t iRGB = 0;
-
 void setup() {
-  // put your setup code here, to run once:
-
- Serial.begin(115200);
+  Serial.begin(115200);
   Serial.println();
   delay(200);
 
-ic2bus_init();
+  ic2bus_init();
 
   IPAddress local_IP(192, 168, 2, 100);
   IPAddress gateway(192, 168, 2, 1);
@@ -39,9 +36,8 @@ ic2bus_init();
   Serial.print("Station IP address = ");
   Serial.println(WiFi.localIP());
 
-websocket_init();
+  websocket_init();
   webserver_init();
-
 }
 
 
@@ -52,9 +48,9 @@ void loop() {
   webSocket.loop();
   //avoid overloading the serial pipe which causes hanging up the terminal and watchdog
   if (currentMillis % 1000 == 0) {
-    if (con == true) {
+    if (websockerConnected == true) {
       i2c_exchange_data();
-      sendDataObject(); //Daten über Websocket nur schicken, wenn Verbindung besteht!
+      sendDataObject();
     }
   }
   server.handleClient();

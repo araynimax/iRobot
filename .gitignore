@@ -14,3 +14,27 @@ ESP8266/website/ignore/
 ESP8266/website/package-lock\.json
 
 ESP8266/data/
+
+MEGA128/project\.cbi
+
+MEGA128/project\.cof
+
+MEGA128/project\.fct
+
+project\.atsln
+
+project\.cbi
+
+*.cfg
+
+*.cof
+
+*.cproj
+
+*.cwp
+
+*.fct
+
+*.prj~
+
+project\.txt

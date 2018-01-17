@@ -1,7 +1,7 @@
 /**
- *  States
+ * Created by ArayniMax
  */
-
+ 
 #define demostate_distance_sensor  0
 #define demostate_engine  1
 #define demostate_lightsensor  2

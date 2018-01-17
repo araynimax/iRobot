@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+ 
 #include <i2c.h>
 #include <math.h>
 #include "port_init.h"

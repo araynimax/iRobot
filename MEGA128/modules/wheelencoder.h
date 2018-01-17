@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+
 struct structWheelEncoder{
   int left;
   int right;

@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+
 #include <twi.h>
 #include <stdint.h>
 

@@ -1,6 +1,10 @@
+/**
+ * Created by ArayniMax
+ */
+
 WebSocketsServer webSocket = WebSocketsServer(81);
 
-bool con = false; //@todo umnennen ist ein sehr allgemeiner name
+bool websockerConnected = false;
 
 
 void processingJSON(JsonObject& root){
@@ -12,14 +16,14 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t lenght)
   switch (type) {
     case WStype_DISCONNECTED:
       Serial.println("Websocket disconnected!");
-      con = false;
+      websockerConnected = false;
       break;
     case WStype_CONNECTED:
       {
       IPAddress ip = webSocket.remoteIP(num);
       Serial.println("Websocket Connected!");
       Serial.println(ip);
-      con = true;
+      websockerConnected = true;
       }
       break;
     case WStype_TEXT:

@@ -1,3 +1,7 @@
+/**
+ * Created by ArayniMax
+ */
+
 #define MainStateMachineState_stop 0
 #define MainStateMachineState_moveL 1
 #define MainStateMachineState_bug 2
@@ -19,7 +23,7 @@ void resetRobot(){
   MotorRight.encoder_changes = -1;
   MotorLeft.force = 0;
   MotorLeft.encoder_changes = -1;
-  ultrasonic_servo.angle = 0; 
+  ultrasonic_servo.angle = 0;
   initRound = 1;
 }
 
@@ -42,23 +46,24 @@ void fnMainStateMachineState_stop(){
 
 void fnMainStateMachineState_moveL(){
     if(initRound==1){
-      moveRobot(1000,100);
-      rotateRobot(90,100);  
-      moveRobot(1000,100);
-      rotateRobot(180,100);
-      moveRobot(1000,100);
-      rotateRobot(-90,100);
-      moveRobot(1000,100);
+      moveRobot(1000,50);
+      rotateRobot(90,50);
+      moveRobot(1000,50);
+      rotateRobot(180,50);
+      moveRobot(1000,50);
+      rotateRobot(-90,50);
+      moveRobot(1000,50);
+      rotateRobot(180,50);
       initRound = 0;
-    }           
+    }
     else if(MainQueueLength == -1){
       setMainStateMachineState(MainStateMachineState_stop);
     }
-    
+
 }
 
 void fnMainStateMachineState_bug(){
-if(LIGHT_SENSOR_LEFT > 800 || LIGHT_SENSOR_RIGHT > 800){
+if(LIGHT_SENSOR_LEFT > 900 || LIGHT_SENSOR_RIGHT > 900){
 
     if(LIGHT_SENSOR_RIGHT>LIGHT_SENSOR_LEFT){
     	MotorRight.force = -55;
@@ -68,15 +73,23 @@ if(LIGHT_SENSOR_LEFT > 800 || LIGHT_SENSOR_RIGHT > 800){
     	MotorRight.force = 0;
         MotorLeft.force = -55;
     }
-    else{
+    else if(LIGHT_SENSOR_RIGHT==LIGHT_SENSOR_LEFT){
     	MotorRight.force = -55;
         MotorLeft.force = -55;
     }
+    else{
+	MotorRight.force = 0;
+        MotorLeft.force = 0;
+    }
+}
+else{
+  MotorRight.force = 0;
+  MotorLeft.force = 0;
 }
 }
 
 void fnMainStateMachineState_moth(){
-  if(LIGHT_SENSOR_LEFT > 800 || LIGHT_SENSOR_RIGHT > 800){
+  if(LIGHT_SENSOR_LEFT > 900 || LIGHT_SENSOR_RIGHT >900){
   if(LIGHT_SENSOR_RIGHT>LIGHT_SENSOR_LEFT){
     MotorRight.force = 0;
     MotorLeft.force = 55;
@@ -86,9 +99,13 @@ void fnMainStateMachineState_moth(){
     MotorRight.force = 55;
     MotorLeft.force = 0;
   }
-  else{
+  else if(LIGHT_SENSOR_RIGHT==LIGHT_SENSOR_LEFT){
     MotorRight.force = 55;
     MotorLeft.force = 55;
+  }
+  else{
+    MotorRight.force = 0;
+    MotorLeft.force = 0;
   }
 }
 else{
@@ -128,35 +145,35 @@ else{
 */
 void fnMainStateMachineState_lineFollow(){
 static int lastMove = 0;
-  if(!LINE_DETECTOR_MID_LEFT && !LINE_DETECTOR_LEFT || LINE_DETECTOR_MID_RIGHT || LINE_DETECTOR_RIGHT ){
-      MotorLeft.force  = -50;
-      MotorRight.force = 60;  
+  if(LINE_DETECTOR_MID_LEFT || LINE_DETECTOR_LEFT && !LINE_DETECTOR_MID_RIGHT || !LINE_DETECTOR_RIGHT ){
+      MotorLeft.force  = -45;
+      MotorRight.force = 60;
       lastMove = 1;
     }
 
-    else if(LINE_DETECTOR_MID_LEFT || LINE_DETECTOR_LEFT || !LINE_DETECTOR_MID_RIGHT && !LINE_DETECTOR_RIGHT){
+    else if(!LINE_DETECTOR_MID_LEFT || !LINE_DETECTOR_LEFT && LINE_DETECTOR_MID_RIGHT || LINE_DETECTOR_RIGHT){
     MotorLeft.force  =  60;
-      MotorRight.force = -50;  
+      MotorRight.force = -45;
       lastMove = 2;
     }
     else if(LINE_DETECTOR_MID_LEFT || LINE_DETECTOR_LEFT && LINE_DETECTOR_MID_RIGHT || LINE_DETECTOR_RIGHT){
-      MotorLeft.force  = 60;
-      MotorRight.force  = 60;    
+      MotorLeft.force  = 55;
+      MotorRight.force  = 55;
       lastMove = 3;
     }
     else{
       switch(lastMove){
-      case 1: 
+      case 1:
           MotorLeft.force  =  60;
-      MotorRight.force = -50;  
-      break; 
-      case 2: 
-          MotorLeft.force  = -50;
-      MotorRight.force = 60;  
+      MotorRight.force = -45;
+      break;
+      case 2:
+          MotorLeft.force  = -45;
+      MotorRight.force = 60;
       break;
       default:
-            MotorLeft.force  = -50;
-            MotorRight.force = 60;  
+            MotorLeft.force  = -45;
+            MotorRight.force = 60;
       }
     }
 }
@@ -167,7 +184,7 @@ if(WiiCamData.coord_X[0] == 1023 && WiiCamData.coord_Y[0] == 1023 && WiiCamData.
 return 0;
 else if(!DISTANCE_SENSOR_FRONT_LEFT || !DISTANCE_SENSOR_FRONT_RIGHT || !BUMPER_LEFT || !BUMPER_RIGHT)
 return 0;
-else return 1; 
+else return 1;
 }
 
 void fnMainStateMachineState_robotFollow(){
@@ -181,7 +198,7 @@ if(followSignal() == 1){
       MotorRight.force =   0;
 	}
     else{
-         MotorRight.force =   55; 
+         MotorRight.force =   55;
          MotorLeft.force =   55;
     }
 
@@ -190,7 +207,7 @@ else{
  MotorLeft.force =   55;
  MotorRight.force = -55;
 }
- 
+
 }
 
 
