@@ -30,8 +30,6 @@ struct structUltraSonicServo{
   unsigned int init;
 } ultrasonic_servo;
 
-//TODO RENAME STRUCTURES AND PUT IT TOGETHER
-
 interrupt [TIM3_CAPT] void timer3_capt_isr(void)
 {
   ultrasonic_data.icr3.byte[0] = ICR3L;
